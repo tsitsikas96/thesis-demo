@@ -1,0 +1,17 @@
+/home/ilias/Workspace/Java_Workspace/gregor-chair/Robot1/Robot1_Coordinator/src/main/java/robot1/fsm/Robot1CoordinatorState.java
+/home/ilias/Workspace/Java_Workspace/gregor-chair/Robot1/Robot1_Coordinator/src/main/java/robot1/fsm/SignalDetector.java
+/home/ilias/Workspace/Java_Workspace/gregor-chair/Robot1/Robot1_Coordinator/src/main/java/robot1/unixsocket/UnixServer.java
+/home/ilias/Workspace/Java_Workspace/gregor-chair/Robot1/Robot1_Coordinator/src/main/java/robot1/fsm/signals/Pos1Reached.java
+/home/ilias/Workspace/Java_Workspace/gregor-chair/Robot1/Robot1_Coordinator/src/main/java/robot1/Robot1CoordinatorApplication.java
+/home/ilias/Workspace/Java_Workspace/gregor-chair/Robot1/Robot1_Coordinator/src/main/java/robot1/lwm2m/RobotObject.java
+/home/ilias/Workspace/Java_Workspace/gregor-chair/Robot1/Robot1_Coordinator/src/main/java/robot1/fsm/signals/W2Available.java
+/home/ilias/Workspace/Java_Workspace/gregor-chair/Robot1/Robot1_Coordinator/src/main/java/robot1/fsm/signals/SubAssW2Completed.java
+/home/ilias/Workspace/Java_Workspace/gregor-chair/Robot1/Robot1_Coordinator/src/main/java/robot1/lwm2m/Robot.java
+/home/ilias/Workspace/Java_Workspace/gregor-chair/Robot1/Robot1_Coordinator/src/main/java/robot1/fsm/signals/Pos2Reached.java
+/home/ilias/Workspace/Java_Workspace/gregor-chair/Robot1/Robot1_Coordinator/src/main/java/robot1/ConfigurationUtils.java
+/home/ilias/Workspace/Java_Workspace/gregor-chair/Robot1/Robot1_Coordinator/src/main/java/robot1/lwm2m/RobotInstance.java
+/home/ilias/Workspace/Java_Workspace/gregor-chair/Robot1/Robot1_Coordinator/src/main/java/robot1/lwm2m/AbstractDevice.java
+/home/ilias/Workspace/Java_Workspace/gregor-chair/Robot1/Robot1_Coordinator/src/main/java/robot1/fsm/Robot1Coordinator.java
+/home/ilias/Workspace/Java_Workspace/gregor-chair/Robot1/Robot1_Coordinator/src/main/java/robot1/fsm/signals/Pos1AvailSignal.java
+/home/ilias/Workspace/Java_Workspace/gregor-chair/Robot1/Robot1_Coordinator/src/main/java/robot1/fsm/signals/SubAss1Completed.java
+/home/ilias/Workspace/Java_Workspace/gregor-chair/Robot1/Robot1_Coordinator/src/main/java/robot1/unixsocket/UnixClient.java

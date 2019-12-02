@@ -1,0 +1,62 @@
+version: "2"
+#version: '3.2'
+networks:
+  gregor-chair-network-w2:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.5.0/24
+
+services:
+  # node-exporter:
+  #   image: prom/node-exporter:v0.18.1
+  #   container_name: w2_node-exporter
+  #   ports:
+  #     - "9100:9100"
+  #   restart: always
+  # cadvisor:
+  #   image: budry/cadvisor-arm:latest #google/cadvisor:v0.33.0  #
+  #   container_name: w2_cadvisor
+  #   restart: always
+  #   ports:
+  #     - "8080:8080"
+  #   volumes:
+  #     - /:/rootfs:ro
+  #     - /var/run:/var/run:rw
+  #     - /sys:/sys:ro
+  #     - /var/lib/docker/:/var/lib/docker:ro
+  #   privileged: true
+  #   depends_on:
+  #     - w2_assembly_coordinator
+  w2_assembly_coordinator:
+    build:
+      context: ./Workbench2_Coordinator
+      dockerfile: Dockerfile
+    container_name: w2_assembly_coordinator
+    ports:
+      - "8565:8565/udp"
+    networks:
+      gregor-chair-network-w2:
+        ipv4_address: 192.168.5.50
+    volumes:
+      - /tmp:/tmp
+    links:
+      - w2_controller
+    mem_limit: 500m
+    privileged: true
+  w2_controller:
+    build:
+      context: ./Workbench2ControllerMs
+      dockerfile: Dockerfile
+    container_name: w2controller
+    volumes:
+      - /tmp:/tmp
+      - /dev/gpiomem:/dev/gpiomem
+    privileged: true
+    environment:
+      - PYTHONUNBUFFERED=1
+    mem_limit: 500m
+
+
+

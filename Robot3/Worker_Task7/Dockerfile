@@ -1,0 +1,17 @@
+# Alpine base image v.3.10 that contains python 3.5.7
+FROM python:3.5.7-alpine3.10
+
+LABEL maintainer="GOCAS"
+
+# Remove cache,tmp files and update
+RUN rm -rf /var/cache/apk/* && \
+    rm -rf /tmp/* && \
+    apk update 
+
+# Copy files
+COPY . /WorkerTask7
+# Set working directory
+WORKDIR /WorkerTask7
+
+# Final command
+ENTRYPOINT ["python3","main.py"]

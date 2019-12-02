@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: robot2.Robot2CpmsApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.321 s - in robot2.Robot2CpmsApplicationTests
