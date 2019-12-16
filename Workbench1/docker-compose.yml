@@ -1,0 +1,46 @@
+version: "3"
+
+networks:
+  gocas-mgmt:
+    external:
+      name: gocas-mgmt
+
+services:
+  w1-assembly-coordinator:
+    image: 127.0.0.1:5000/w1_assembly_coordinator
+    build:
+      context: ./Workbench1_Coordinator
+      dockerfile: Dockerfile
+    container_name: w1_assembly_coordinator
+    deploy:
+      placement:
+          constraints:
+              - node.hostname==Workbench1
+      resources:
+          limits:
+              memory: 500M
+    networks: 
+      - gocas-mgmt
+    volumes:
+      - /tmp:/tmp
+    # privileged: true
+    
+  w1_controller:
+    image: 127.0.0.1:5000/w1_controller
+    build:
+      context: ./Workbench1ControllerMs
+      dockerfile: Dockerfile
+    container_name: w1controller
+    deploy:
+      placement:
+          constraints:
+              - node.hostname==Workbench1
+      resources:
+          limits:
+              memory: 500M
+    volumes:
+      - /tmp:/tmp
+      # - /dev/gpiomem:/dev/gpiomem
+    # privileged: true
+    environment:
+      - PYTHONUNBUFFERED=1

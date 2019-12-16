@@ -1,0 +1,117 @@
+version: "3"
+
+networks:
+  gocas-mgmt:
+    external:
+      name: gocas-mgmt
+
+services:
+  r3_assembly_coordinator:
+    image: 127.0.0.1:5000/r3_assembly_coordinator
+    build:
+      context: ./Robot3_Coordinator
+      dockerfile: Dockerfile
+    container_name: r3_assembly_coordinator
+    deploy:
+      placement:
+          constraints:
+              - node.hostname==Robot3
+      resources:
+          limits:
+              memory: 500M
+    networks:
+      - gocas-mgmt
+    volumes:
+      - /tmp:/tmp
+
+  workertask6:
+    image: 127.0.0.1:5000/workertask6
+    build:
+      context: ./Worker_Task6
+      dockerfile: Dockerfile
+    container_name: workertask6
+    deploy:
+      placement:
+          constraints:
+              - node.hostname==Robot3
+      resources:
+          limits:
+              memory: 500M
+    volumes:
+      - /tmp:/tmp
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  workertask7:
+    image: 127.0.0.1:5000/workertask7
+    build:
+      context: ./Worker_Task7
+      dockerfile: Dockerfile
+    container_name: workertask7
+    deploy:
+      placement:
+          constraints:
+              - node.hostname==Robot3
+      resources:
+          limits:
+              memory: 500M
+    volumes:
+      - /tmp:/tmp
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  workertask8:
+    image: 127.0.0.1:5000/workertask8
+    build:
+      context: ./Worker_Task8
+      dockerfile: Dockerfile
+    container_name: workertask8
+    deploy:
+      placement:
+          constraints:
+              - node.hostname==Robot3
+      resources:
+          limits:
+              memory: 500M
+    volumes:
+      - /tmp:/tmp
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  # workertask9:
+  #   image: 127.0.0.1:5000/workertask9
+  #   build:
+  #     context: ./Worker_Task9
+  #     dockerfile: Dockerfile
+  #   container_name: workertask9
+  #   deploy:
+  #     placement:
+  #         constraints:
+  #             - node.hostname==Robot3
+  #     resources:
+  #         limits:
+  #             memory: 500M
+  #   volumes:
+  #     - /tmp:/tmp
+  #   environment:
+  #     - PYTHONUNBUFFERED=1
+
+  r3_controller:
+    image: 127.0.0.1:5000/r3_controller
+    build:
+      context: ./RobotControllerMs
+      dockerfile: Dockerfile
+    container_name: robot3controller
+    deploy:
+      placement:
+          constraints:
+              - node.hostname==Robot3
+      resources:
+          limits:
+              memory: 500M
+    volumes:
+      - /tmp:/tmp
+      # - /dev/gpiomem:/dev/gpiomem
+    # privileged: true
+    environment:
+      - PYTHONUNBUFFERED=1
