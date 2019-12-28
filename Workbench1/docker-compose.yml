@@ -7,6 +7,7 @@ networks:
 
 services:
   w1-assembly-coordinator:
+    # image: 192.168.10.105:5000/w1_assembly_coordinator
     image: 127.0.0.1:5000/w1_assembly_coordinator
     build:
       context: ./Workbench1_Coordinator
@@ -15,7 +16,7 @@ services:
     deploy:
       placement:
           constraints:
-              - node.hostname==Workbench1
+              - node.hostname==GOCASw1
       resources:
           limits:
               memory: 500M
@@ -23,9 +24,9 @@ services:
       - gocas-mgmt
     volumes:
       - /tmp:/tmp
-    # privileged: true
     
   w1_controller:
+    # image: 192.168.1.105:5000/w1_controller
     image: 127.0.0.1:5000/w1_controller
     build:
       context: ./Workbench1ControllerMs
@@ -34,13 +35,12 @@ services:
     deploy:
       placement:
           constraints:
-              - node.hostname==Workbench1
+              - node.hostname==GOCASw1
       resources:
           limits:
               memory: 500M
     volumes:
       - /tmp:/tmp
-      # - /dev/gpiomem:/dev/gpiomem
-    # privileged: true
+      - /sys:/sys
     environment:
       - PYTHONUNBUFFERED=1

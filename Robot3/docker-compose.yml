@@ -7,6 +7,7 @@ networks:
 
 services:
   r3_assembly_coordinator:
+    # image: 192.168.10.105:5000/r3_assembly_coordinator
     image: 127.0.0.1:5000/r3_assembly_coordinator
     build:
       context: ./Robot3_Coordinator
@@ -15,7 +16,7 @@ services:
     deploy:
       placement:
           constraints:
-              - node.hostname==Robot3
+              - node.hostname==GOCASr3
       resources:
           limits:
               memory: 500M
@@ -25,6 +26,7 @@ services:
       - /tmp:/tmp
 
   workertask6:
+    # image: 192.168.10.105:5000/workertask6
     image: 127.0.0.1:5000/workertask6
     build:
       context: ./Worker_Task6
@@ -33,7 +35,7 @@ services:
     deploy:
       placement:
           constraints:
-              - node.hostname==Robot3
+              - node.hostname==GOCASr3
       resources:
           limits:
               memory: 500M
@@ -43,6 +45,7 @@ services:
       - PYTHONUNBUFFERED=1
 
   workertask7:
+    # image: 192.168.10.105:5000/workertask7
     image: 127.0.0.1:5000/workertask7
     build:
       context: ./Worker_Task7
@@ -51,7 +54,7 @@ services:
     deploy:
       placement:
           constraints:
-              - node.hostname==Robot3
+              - node.hostname==GOCASr3
       resources:
           limits:
               memory: 500M
@@ -61,6 +64,7 @@ services:
       - PYTHONUNBUFFERED=1
 
   workertask8:
+    # image: 192.168.10.105:5000/workertask8
     image: 127.0.0.1:5000/workertask8
     build:
       context: ./Worker_Task8
@@ -69,7 +73,7 @@ services:
     deploy:
       placement:
           constraints:
-              - node.hostname==Robot3
+              - node.hostname==GOCASr3
       resources:
           limits:
               memory: 500M
@@ -79,7 +83,7 @@ services:
       - PYTHONUNBUFFERED=1
 
   # workertask9:
-  #   image: 127.0.0.1:5000/workertask9
+  #   image: 192.168.10.105:5000/workertask9
   #   build:
   #     context: ./Worker_Task9
   #     dockerfile: Dockerfile
@@ -87,7 +91,7 @@ services:
   #   deploy:
   #     placement:
   #         constraints:
-  #             - node.hostname==Robot3
+  #             - node.hostname==GOCASr3
   #     resources:
   #         limits:
   #             memory: 500M
@@ -97,6 +101,7 @@ services:
   #     - PYTHONUNBUFFERED=1
 
   r3_controller:
+    # image: 192.168.10.105:5000/r3_controller
     image: 127.0.0.1:5000/r3_controller
     build:
       context: ./RobotControllerMs
@@ -105,13 +110,12 @@ services:
     deploy:
       placement:
           constraints:
-              - node.hostname==Robot3
+              - node.hostname==GOCASr3
       resources:
           limits:
               memory: 500M
     volumes:
       - /tmp:/tmp
-      # - /dev/gpiomem:/dev/gpiomem
-    # privileged: true
+      - /sys:/sys
     environment:
       - PYTHONUNBUFFERED=1

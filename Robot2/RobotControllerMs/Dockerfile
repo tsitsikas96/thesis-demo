@@ -3,10 +3,6 @@ FROM python:3.5.7-alpine3.10
 
 LABEL maintainer="GOCAS"
 
-# Environment Variables
-# ENV DEVICE                   RPI
-ENV DEVICE                   LAPTOP
-
 # Remove cache,tmp files and update
 RUN rm -rf /var/cache/apk/* && \
     rm -rf /tmp/* && \
@@ -14,7 +10,7 @@ RUN rm -rf /var/cache/apk/* && \
 # Install necessary libs for rpi.gpio
     apk add --no-cache gcc musl-dev && \
 # Install rpi.gpio  to have access to gpio pins from docker
-    pip install --no-cache-dir rpi.gpio && \
+    pip install --no-cache-dir gpio && \
 # Remove libs
     apk del gcc musl-dev
 
@@ -22,6 +18,10 @@ RUN rm -rf /var/cache/apk/* && \
 COPY . /Robot2ControllerMs
 # Set working directory
 WORKDIR /Robot2ControllerMs
+
+# Environment Variables
+# ENV DEVICE                   RPI
+ENV DEVICE                   LAPTOP
 
 # Final command
 ENTRYPOINT ["sh","-c","python3 main.py ${DEVICE}"]

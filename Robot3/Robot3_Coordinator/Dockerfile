@@ -24,7 +24,7 @@ RUN export LANGUAGE=${LANG} && export LANG=${LANG} && \
      export PATH=$JAVA_HOME/jre/bin:$PATH
 
 ENV W1_COAP_SERVER           coap://w1-assembly-coordinator:8563
-ENV CONFIGURATOR_SERVER      coap://192.168.99.1:5683
+ENV CONFIGURATOR_SERVER      coap://192.168.10.105:5683
 
 # Copy files
 COPY target/Robot3_Coordinator-0.0.1-SNAPSHOT.jar /Robot3Coordinator/Robot3_Coordinator-0.0.1-SNAPSHOT.jar

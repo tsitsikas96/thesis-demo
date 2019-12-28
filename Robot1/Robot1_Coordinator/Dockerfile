@@ -27,7 +27,7 @@ RUN export LANGUAGE=${LANG} && export LANG=${LANG} && \
 
 ENV W1_COAP_SERVER           coap://w1-assembly-coordinator:8563
 ENV W2_COAP_SERVER           coap://w2-assembly-coordinator:8565
-ENV CONFIGURATOR_SERVER      coap://192.168.99.1:5683
+ENV CONFIGURATOR_SERVER      coap://192.168.10.105:5683
 
 # Copy files
 COPY target/Robot1_Coordinator-0.0.1-SNAPSHOT.jar /Robot1Coordinator/Robot1_Coordinator-0.0.1-SNAPSHOT.jar
