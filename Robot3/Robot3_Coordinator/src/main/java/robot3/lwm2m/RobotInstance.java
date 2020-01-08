@@ -10,8 +10,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import robot3.fsm.Robot3Coordinator;
 import robot3.fsm.SignalDetector;
+import robot3.fsm.signals.NewOrder;
 import robot3.fsm.signals.W1Pos3Available;
 import uml4iot.GenericStateMachine.core.BaseSignal;
+
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 public class RobotInstance extends BaseInstanceEnabler {
 
@@ -21,6 +25,7 @@ public class RobotInstance extends BaseInstanceEnabler {
     public static String event2sim;
     public static Robot3Coordinator robot3Ctrl;
     public static SignalDetector signaldetect;
+    public static BlockingQueue<Boolean> orderQueue = new ArrayBlockingQueue<Boolean>(1);
     public RobotInstance(final Robot3Coordinator robot3Ctrl, String endpoint) {
     	this.robot3Ctrl = robot3Ctrl;
     	signaldetect = new SignalDetector(robot3Ctrl.itsMsgQ);
@@ -38,6 +43,8 @@ public class RobotInstance extends BaseInstanceEnabler {
             return ReadResponse.success(resourceid,event);
         case 20:
             return ReadResponse.success(resourceid,event2sim);
+        case 21:
+            return ReadResponse.success(resourceid,"Robot3 Done");
         default:
             return super.read(identity,resourceid);
         }
@@ -49,6 +56,13 @@ public class RobotInstance extends BaseInstanceEnabler {
         switch (resourceid) {
         case 3:    //setPos3Available
         	 return addSignal(params, W1Pos3Available.class);
+        case 5:
+            try {
+                orderQueue.put(true);
+                return addSignal(params, NewOrder.class);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         default:
             return execute(identity,resourceid, params);
         }
@@ -68,20 +82,18 @@ public class RobotInstance extends BaseInstanceEnabler {
     }
 
     private <T extends BaseSignal> ExecuteResponse addSignal(String args, Class<T> clazz){
-       /* if (args == null){
+        if (args == null){
             return ExecuteResponse.badRequest("Arguments not correct");
         }
-        try {
-            Constructor<T> ctor = clazz.getConstructor(String.class);
-            BaseSignal sign = ctor.newInstance(args);
-            robot3Ctrl.getEventQueue().put(sign);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            return ExecuteResponse.internalServerError("Operation stopped:" + e.getMessage());
-        } catch (Exception e){
-            return ExecuteResponse.badRequest("Arguments not correct:" + e.getMessage());
-        }*/
-    	signaldetect.msgQ.add(new W1Pos3Available());
-        return ExecuteResponse.success();
+       switch (clazz.getSimpleName()){
+           case "W1Pos3Available":
+               signaldetect.msgQ.add(new W1Pos3Available());
+               return ExecuteResponse.success();
+           case "NewOrder":
+               signaldetect.msgQ.add(new NewOrder());
+               return ExecuteResponse.success();
+           default:
+               return ExecuteResponse.badRequest(args) ;
+       }
     }
 }

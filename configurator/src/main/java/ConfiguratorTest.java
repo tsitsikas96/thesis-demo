@@ -1,10 +1,3 @@
-import com.github.dockerjava.api.DockerClient;
-import com.github.dockerjava.api.command.DockerCmdExecFactory;
-import com.github.dockerjava.api.model.Info;
-import com.github.dockerjava.core.DefaultDockerClientConfig;
-import com.github.dockerjava.core.DockerClientBuilder;
-import com.github.dockerjava.core.DockerClientConfig;
-import com.github.dockerjava.jaxrs.JerseyDockerCmdExecFactory;
 import listeners.CustomRegistrationListener;
 import org.eclipse.leshan.core.model.ObjectLoader;
 import org.eclipse.leshan.core.model.ObjectModel;
@@ -41,7 +34,6 @@ public class ConfiguratorTest {
     }
 
     public static void main(String[] args) {
-//        UserInterface ui = new UserInterface();
         server = createAndStartServer();
         setRegistrationListener();
     }

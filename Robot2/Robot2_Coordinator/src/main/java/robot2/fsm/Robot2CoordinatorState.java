@@ -2,6 +2,7 @@ package robot2.fsm;
 
 public enum Robot2CoordinatorState {
 
+    WAITING_4_ORDER,
     WAITING_4_W1POS2_PART1,
     SUBASS2,
     MOVING_2_POS2,

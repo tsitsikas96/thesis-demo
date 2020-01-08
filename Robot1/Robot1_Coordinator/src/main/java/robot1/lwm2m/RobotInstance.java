@@ -11,9 +11,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import robot1.fsm.Robot1Coordinator;
 import robot1.fsm.SignalDetector;
+import robot1.fsm.signals.NewOrder;
 import robot1.fsm.signals.Pos1AvailSignal;
 import robot1.fsm.signals.W2Available;
 import uml4iot.GenericStateMachine.core.BaseSignal;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 public class RobotInstance extends BaseInstanceEnabler {
 
@@ -23,6 +26,7 @@ public class RobotInstance extends BaseInstanceEnabler {
     public static String event2sim;
     public static Robot1Coordinator robot1Coordinator;
     public static SignalDetector signaldetect;
+    public static BlockingQueue<Boolean> orderQueue = new ArrayBlockingQueue<Boolean>(1);
     public RobotInstance(final Robot1Coordinator robot1Coordinator, String endpoint) {
     	RobotInstance.robot1Coordinator = robot1Coordinator;
     	signaldetect = new SignalDetector(robot1Coordinator.itsMsgQ);
@@ -40,6 +44,8 @@ public class RobotInstance extends BaseInstanceEnabler {
             return ReadResponse.success(resourceid,event);
         case 20:
             return ReadResponse.success(resourceid,event2sim);
+        case 21:
+            return ReadResponse.success(resourceid,"Robot1 Done");
         default:
             return super.read(identity,resourceid);
         }
@@ -53,10 +59,16 @@ public class RobotInstance extends BaseInstanceEnabler {
             return addSignal(params, Pos1AvailSignal.class);
         case 4:    //setW2Available
        	    return addSignal(params, W2Available.class);
+        case 5:
+            try {
+                orderQueue.put(true);
+                return addSignal(params, NewOrder.class);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         default:
             return execute(identity,resourceid, params);
         }
-
     }
 
     @Override
@@ -82,15 +94,18 @@ public class RobotInstance extends BaseInstanceEnabler {
         if (args == null){
             return ExecuteResponse.badRequest("Arguments not correct");
         }
-            switch(clazz.getSimpleName()){
-	            case "Pos1AvailSignal":    //setPos1Available
-	            	signaldetect.msgQ.add( new Pos1AvailSignal());
-	            	 return ExecuteResponse.success();
-	            case "W2Available":    //setW2Available
-	            	signaldetect.msgQ.add(new W2Available());
-	            	return ExecuteResponse.success();
-	            default:
-	               return ExecuteResponse.badRequest(args) ;
+        switch(clazz.getSimpleName()){
+            case "Pos1AvailSignal":    //setPos1Available
+                signaldetect.msgQ.add( new Pos1AvailSignal());
+                 return ExecuteResponse.success();
+            case "W2Available":    //setW2Available
+                signaldetect.msgQ.add(new W2Available());
+                return ExecuteResponse.success();
+            case "NewOrder":
+                signaldetect.msgQ.add(new NewOrder());
+                return ExecuteResponse.success();
+            default:
+               return ExecuteResponse.badRequest(args) ;
 	        }
     }
 }

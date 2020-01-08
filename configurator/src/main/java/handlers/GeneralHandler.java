@@ -7,23 +7,35 @@ import org.eclipse.leshan.core.response.ObserveResponse;
 import org.eclipse.leshan.server.californium.impl.LeshanServer;
 import org.eclipse.leshan.server.registration.Registration;
 
+import java.sql.Timestamp;
+
 public class GeneralHandler {
 
     private LeshanServer server;
-    private Registration registration;
 
-    public GeneralHandler(LeshanServer server_src, Registration registration){
+    public GeneralHandler(LeshanServer server_src){
         this.server = server_src;
-        this.registration = registration;
     }
 
-    public void sendObserveRequest(int objectId,int objectInstanceId, int resourceId){
+    public void sendObserveRequest(Registration registration, int objectId, int objectInstanceId, int resourceId){
         try {
-            ObserveResponse response = this.server.send(this.registration, new ObserveRequest(objectId,objectInstanceId,resourceId));
+            ObserveResponse response = this.server.send(registration, new ObserveRequest(objectId,objectInstanceId,resourceId));
             if (response.isSuccess()) {
-                System.out.println("Observing: " + objectId + "/"+objectInstanceId + "/" + resourceId + " at " + this.registration.getEndpoint());
+                System.out.println("Observing: " + objectId + "/"+objectInstanceId + "/" + resourceId + " at " + registration.getEndpoint());
             }else {
                 System.out.println("Failed to observe: " + objectId + "/"+objectInstanceId + "/" + resourceId);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+    public void sendExecuteRequest(Registration registration, int objectId, int objectInstanceId, int resourceId){
+        try {
+            ExecuteResponse response = this.server.send(registration, new ExecuteRequest(objectId,objectInstanceId,resourceId,String.format("{ \"sender\": \"SERVER\", \"receiver\": \"ROBOT\", \"timestamp\": \"%s\"}", new Timestamp(System.currentTimeMillis()))));
+            if (response.isSuccess()) {
+                System.out.println("Executing: " + objectId + "/"+objectInstanceId + "/" + resourceId + " at " + registration.getEndpoint());
+            }else {
+                System.out.println("Failed to execute: " + objectId + "/"+objectInstanceId + "/" + resourceId);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();

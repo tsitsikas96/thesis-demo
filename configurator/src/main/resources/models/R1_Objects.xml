@@ -38,6 +38,16 @@
 				<Units>No units</Units>
 				<Description></Description>
 			</Item>
+			<Item ID="5">
+				<Name>New Order</Name>
+				<Operations>E</Operations>
+				<MultipleInstances>Single</MultipleInstances>
+				<Mandatory>Optional</Mandatory>
+				<Type>Boolean</Type>
+				<RangeEnumeration></RangeEnumeration>
+				<Units>No units</Units>
+				<Description></Description>
+			</Item>
             <Item ID="16">
 				<Name>R1event2W</Name>
 				<Operations>R</Operations>
@@ -50,6 +60,16 @@
 			</Item>
             <Item ID="20">
 				<Name>R2Event2Sim</Name>
+				<Operations>R</Operations>
+				<MultipleInstances>Single</MultipleInstances>
+				<Mandatory>Mandatory</Mandatory>
+				<Type>String</Type>
+				<RangeEnumeration></RangeEnumeration>
+				<Units>No units</Units>
+				<Description></Description>
+			</Item>
+			<Item ID="21">
+				<Name>RobotFinished</Name>
 				<Operations>R</Operations>
 				<MultipleInstances>Single</MultipleInstances>
 				<Mandatory>Mandatory</Mandatory>
