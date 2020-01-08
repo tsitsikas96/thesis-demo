@@ -5,6 +5,8 @@ buildnpush.sh
 deploy.sh
 stop.sh
 close-rpis.sh
+start-docker-machines.sh
+swarm-init.sh
 logs/
 GPIO/
 Robot1/RobotControllerMs/Controller/__pycache__/
@@ -13,6 +15,7 @@ Robot1/RobotControllerMs/unix_sockets/__pycache__/
 Robot1/Robot1_Coordinator/.idea/
 Robot1/Robot1_Coordinator/.mvn/
 Robot1/Robot1_Coordinator/target/
+Robot2/Robot2_Coordinator/Robot2_Coordinator.iml
 Robot2/RobotControllerMs/Controller/__pycache__/
 Robot2/RobotControllerMs/Services/__pycache__/
 Robot2/RobotControllerMs/unix_sockets/__pycache__/
