@@ -1,3 +1,12 @@
+FROM maven:alpine as builder
+WORKDIR /build
+COPY pom.xml .
+RUN mvn dependency:go-offline
+
+COPY src/ /build/src/
+COPY mvnw .
+RUN mvn package
+
 # Debian 9(Stretch) base image
 FROM debian:9-slim
 
@@ -27,12 +36,14 @@ RUN export LANGUAGE=${LANG} && export LANG=${LANG} && \
 
 ENV W1_COAP_SERVER           coap://w1-assembly-coordinator:8563
 ENV W2_COAP_SERVER           coap://w2-assembly-coordinator:8565
-ENV CONFIGURATOR_SERVER      coap://192.168.10.105:5683
+ENV CONFIGURATOR_SERVER      coap://192.168.99.1:5683
 
-# Copy files
-COPY target/Robot1_Coordinator-0.0.1-SNAPSHOT.jar /Robot1Coordinator/Robot1_Coordinator-0.0.1-SNAPSHOT.jar
 # Set working directory
 WORKDIR /Robot1Coordinator
+
+# Copy files
+COPY --from=builder /build/target/Robot1_Coordinator-0.0.1-SNAPSHOT.jar .
+# COPY target/Robot1_Coordinator-0.0.1-SNAPSHOT.jar /Robot1Coordinator/Robot1_Coordinator-0.0.1-SNAPSHOT.jar
 
 # Final command
 ENTRYPOINT ["sh","-c","java -jar Robot1_Coordinator-0.0.1-SNAPSHOT.jar ${W1_COAP_SERVER} ${W2_COAP_SERVER} ${CONFIGURATOR_SERVER}"]
