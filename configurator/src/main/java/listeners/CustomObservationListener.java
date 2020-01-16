@@ -1,13 +1,13 @@
 package listeners;
 
 import configurators.Robot1Configurator;
+import configurators.Robot2Configurator;
+import configurators.Robot3Configurator;
 import handlers.GeneralHandler;
 import org.eclipse.leshan.core.observation.Observation;
 import org.eclipse.leshan.core.response.ObserveResponse;
 import org.eclipse.leshan.server.observation.ObservationListener;
 import org.eclipse.leshan.server.registration.Registration;
-
-import java.util.concurrent.BlockingQueue;
 
 public class CustomObservationListener implements ObservationListener {
 
@@ -34,6 +34,12 @@ public class CustomObservationListener implements ObservationListener {
                 case "Robot1":
                     new Thread(new Robot1Configurator(this.handler,registration)).start();
                     break;
+                case "Robot2":
+                    new Thread(new Robot2Configurator(this.handler,registration)).start();
+                    break;
+                case "Robot3":
+                    new Thread(new Robot3Configurator(this.handler,registration)).start();
+                    break;
             }
         }
         else {
@@ -43,6 +49,5 @@ public class CustomObservationListener implements ObservationListener {
 
     @Override
     public void onError(Observation observation, Registration registration, Exception e) {}
-
 
 }

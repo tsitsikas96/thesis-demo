@@ -18,11 +18,6 @@ public class Robot2Configurator implements Runnable{
 
     @Override
     public void run() {
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        this.handler.sendExecuteRequest(registration,MODEL,INSTANCE,NEW_ORDER);
+        System.out.println("Robot 2 Finished");
     }
 }

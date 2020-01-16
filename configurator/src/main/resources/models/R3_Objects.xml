@@ -28,6 +28,16 @@
 				<Units>No units</Units>
 				<Description></Description>
 			</Item>
+			<Item ID="5">
+				<Name>New Order</Name>
+				<Operations>E</Operations>
+				<MultipleInstances>Single</MultipleInstances>
+				<Mandatory>Optional</Mandatory>
+				<Type>Boolean</Type>
+				<RangeEnumeration></RangeEnumeration>
+				<Units>No units</Units>
+				<Description></Description>
+			</Item>
             <Item ID="16">
 				<Name>R3event2W</Name>
 				<Operations>R</Operations>

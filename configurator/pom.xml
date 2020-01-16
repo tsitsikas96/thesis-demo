@@ -29,14 +29,25 @@
             <version>3.8.1</version>
             <scope>test</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-server -->
         <dependency>
-            <groupId>com.github.docker-java</groupId>
-            <artifactId>docker-java</artifactId>
-            <!--
-             use latest version https://github.com/docker-java/docker-java/releases
-            -->
-            <version>3.1.1</version>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <version>9.4.25.v20191220</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-servlet -->
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-servlet</artifactId>
+            <version>9.4.25.v20191220</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.18</version>
+        </dependency>
+
     </dependencies>
     <properties>
         <!--  specify which version of Java to build against -->
@@ -50,7 +61,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>ConfiguratorTest</mainClass>
+                            <mainClass>servers.ConfiguratorTest</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

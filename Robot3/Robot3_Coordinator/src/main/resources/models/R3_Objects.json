@@ -29,6 +29,17 @@
         "description": ""
       },
       {
+        "id": 5,
+        "name": "new order",
+        "operations": "E",
+        "instancetype": "single",
+        "mandatory": false,
+        "type": "boolean",
+        "range": "",
+        "units": "",
+        "description": ""
+      },
+      {
         "id": 16,
         "name": "R3event2W",
         "operations": "R",

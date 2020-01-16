@@ -2,6 +2,7 @@ package configurators;
 
 import handlers.GeneralHandler;
 import org.eclipse.leshan.server.registration.Registration;
+import servlets.OrderHandler;
 
 public class Robot3Configurator implements Runnable{
 
@@ -18,11 +19,11 @@ public class Robot3Configurator implements Runnable{
 
     @Override
     public void run() {
+        System.out.println("Robot 3 Finished");
         try {
-            Thread.sleep(5000);
+            OrderHandler.orderqueue.put(true);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        this.handler.sendExecuteRequest(registration,MODEL,INSTANCE,NEW_ORDER);
     }
 }

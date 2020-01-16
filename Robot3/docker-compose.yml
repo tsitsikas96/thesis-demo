@@ -7,8 +7,8 @@ networks:
 
 services:
   r3_assembly_coordinator:
-    # image: 192.168.10.105:5000/r3_assembly_coordinator
-    image: 127.0.0.1:5000/r3_assembly_coordinator
+    # image: 192.168.10.105:5000/r3_assembly_coordinator:no_cushion
+    image: 127.0.0.1:5000/r3_assembly_coordinator:no_cushion
     build:
       context: ./Robot3_Coordinator
       dockerfile: Dockerfile
