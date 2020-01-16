@@ -1,0 +1,24 @@
+version: '2'
+services:
+  db:
+    image: mysql
+    container_name: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      - MYSQL_DATABASE=gocas_shop
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=qwe123
+      - MYSQL_ROOT_PASSWORD=qwe123
+    ports:
+      # just if you also want to access it directly from you host
+      # node neede for phpmyadmin
+      - "50000:3306"
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: myadmin
+    depends_on:
+      - db
+    ports:
+      - "8081:80"
+    links:
+      - db
