@@ -7,8 +7,7 @@ networks:
 
 services: 
     r1_assembly_coordinator:
-        # image: 192.168.10.105:5000/r1_assembly_coordinator
-        image: 127.0.0.1:5000/r1_assembly_coordinator
+        image: 192.168.10.105:5000/r1_assembly_coordinator
         build:
             context: ./Robot1_Coordinator
             dockerfile: Dockerfile
@@ -26,8 +25,7 @@ services:
             - /tmp:/tmp
 
     workertask1:
-        # image: 192.168.10.105:5000/workertask1
-        image: 127.0.0.1:5000/workertask1
+        image: 192.168.10.105:5000/workertask1
         build:
             context: ./WorkerTask1
             dockerfile: Dockerfile
@@ -45,8 +43,7 @@ services:
             - PYTHONUNBUFFERED=1
 
     workertask4:
-        # image: 192.168.10.105:5000/workertask4
-        image: 127.0.0.1:5000/workertask4
+        image: 192.168.10.105:5000/workertask4
         build:
             context: ./WorkerTask4
             dockerfile: Dockerfile
@@ -64,8 +61,7 @@ services:
             - PYTHONUNBUFFERED=1
 
     r1_controller:
-        # image: 192.168.10.105:5000/r1_controller
-        image: 127.0.0.1:5000/r1_controller
+        image: 192.168.10.105:5000/r1_controller
         build:
             context: ./RobotControllerMs
             dockerfile: Dockerfile

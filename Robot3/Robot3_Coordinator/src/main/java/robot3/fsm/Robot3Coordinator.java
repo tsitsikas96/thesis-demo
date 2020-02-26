@@ -7,6 +7,9 @@ import robot3.lwm2m.RobotInstance;
 import robot3.unixsocket.UnixClient;
 import robot3.unixsocket.UnixServer;
 import uml4iot.GenericStateMachine.core.*;
+
+import java.io.*;
+import java.util.Scanner;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -37,6 +40,7 @@ public class Robot3Coordinator extends StateMachine{
 
         new Waiting4Order_2_Waiting4W1Pos3(waiting4order,waiting4w1pos3);
         new waiting4W1Pos3_2_subAss3 (waiting4w1pos3,subAss3);
+//        new subAss3_2_waiting4W1Pos3 (subAss3,waiting4w1pos3);
         new subAss3_2_waiting4order (subAss3,waiting4order);
 
         LOGGER = Logger.getLogger(Robot3Coordinator.class.getName() + " LOGGER");
@@ -58,7 +62,7 @@ public class Robot3Coordinator extends StateMachine{
 
         @Override
         protected void entry() {
-            robot3State = Robot3CoordinatorState.WAITING4ORDER;
+            robot3State = Robot3CoordinatorState.WAITING_4_ORDER;
             Robot3Coordinator.LOGGER.severe("R3: Assembly Coordinator State = " + robot3State + "\n");
             wait4Order();
         }
@@ -71,11 +75,6 @@ public class Robot3Coordinator extends StateMachine{
         @Override
         protected void exit() {
             orderReceived();
-            try {
-                Thread.sleep(750);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -84,15 +83,18 @@ public class Robot3Coordinator extends StateMachine{
         @Override
         protected void entry() {
             SendAcquire2W1Pos3();
+//            wait4Order();
             robot3State = Robot3CoordinatorState.WAITING4W1POS3;
             LOGGER.warning("R3: Assembly Coordinator State = " + robot3State +"\n");
         }
 
         @Override
-        protected void doActivity() { }
+        protected void doActivity() {}
 
         @Override
-        protected void exit() { }
+        protected void exit() {
+//            orderReceived();
+        }
     }
 
     public class SubAss3 extends State {
@@ -114,14 +116,14 @@ public class Robot3Coordinator extends StateMachine{
         @Override
         protected void exit() {
             SendRelease2W1Pos3();
+            Robot3Coordinator.LOGGER.severe("R3: Notifying Configurator\n");
+            Robot3CoordinatorApplication.robot3.robot3instance.fireResourcesChange(21);
             try {
 				Thread.sleep(750);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-            Robot3Coordinator.LOGGER.severe("R3: Notifying Configurator\n");
-            Robot3CoordinatorApplication.robot3.robot3instance.fireResourcesChange(21);
         }
     }
 
@@ -153,6 +155,22 @@ public class Robot3Coordinator extends StateMachine{
         protected boolean trigger(SMReception smReception) {
             Robot3Coordinator.LOGGER.warning("R3: Event Reception = " + smReception +"\n");
             return (smReception instanceof W1Pos3Available);
+        }
+
+        @Override
+        protected void effect() { }
+    }
+
+    class subAss3_2_waiting4W1Pos3 extends Transition {
+
+        public subAss3_2_waiting4W1Pos3(State fromState, State toState) {
+            super(fromState, toState);
+        }
+
+        @Override
+        protected boolean trigger(SMReception smReception) {
+            Robot3Coordinator.LOGGER.warning("R3: Event Reception = " + smReception +"\n");
+            return (smReception instanceof SubAssR3Completed);
         }
 
         @Override

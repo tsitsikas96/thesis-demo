@@ -1,6 +1,6 @@
 package robot3.lwm2m;
 
-import java.io.InputStream;
+import java.io.*;
 import java.util.*;
 
 import org.eclipse.leshan.client.californium.LeshanClient;
@@ -15,8 +15,12 @@ import org.eclipse.leshan.core.model.ResourceModel;
 import org.eclipse.leshan.core.request.BindingMode;
 import static org.eclipse.leshan.LwM2mId.*;
 import static org.eclipse.leshan.client.object.Security.*;
+import static robot3.fsm.Robot3Coordinator.LOGGER;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import robot3.ConfigurationUtils;
+import robot3.Robot3CoordinatorApplication;
 
 public abstract class AbstractDevice {
     String endpoint, localAddress, secureLocalAddress, serverURIforW1, serverURIforW2,serverURIforConfigurator, serverURIforSimulator;
@@ -56,8 +60,8 @@ public abstract class AbstractDevice {
         Runtime.getRuntime().addShutdownHook(new Thread() {
               @Override
               public void run() {
-                client2W1.destroy(true); // send de-registration request before destroy
-                client2Configurator.destroy(true);
+              client2W1.destroy(true); // send de-registration request before destroy
+              client2Configurator.destroy(true);
         }});
     }
 

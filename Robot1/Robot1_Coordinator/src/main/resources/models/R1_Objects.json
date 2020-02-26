@@ -51,6 +51,28 @@
         "description": ""
       },
       {
+        "id": 6,
+        "name": "r3 disconnected",
+        "operations": "E",
+        "instancetype": "single",
+        "mandatory": false,
+        "type": "boolean",
+        "range": "",
+        "units": "",
+        "description": ""
+      },
+      {
+        "id": 7,
+        "name": "r3 reconnected",
+        "operations": "E",
+        "instancetype": "single",
+        "mandatory": false,
+        "type": "boolean",
+        "range": "",
+        "units": "",
+        "description": ""
+      },
+      {
         "id": 16,
         "name": "R1event2W",
         "operations": "R",

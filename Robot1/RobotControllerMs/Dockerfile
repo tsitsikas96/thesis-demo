@@ -20,8 +20,8 @@ COPY . /Robot1ControllerMs
 WORKDIR /Robot1ControllerMs
 
 # Environment Variables
-# ENV DEVICE                   RPI
-ENV DEVICE                   LAPTOP
+ENV DEVICE                   RPI
+# ENV DEVICE                   LAPTOP
 
 # Final command
 ENTRYPOINT ["sh","-c","python3 main.py ${DEVICE}"]

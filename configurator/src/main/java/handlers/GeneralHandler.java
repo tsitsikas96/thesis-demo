@@ -6,22 +6,26 @@ import org.eclipse.leshan.core.response.ExecuteResponse;
 import org.eclipse.leshan.core.response.ObserveResponse;
 import org.eclipse.leshan.server.californium.impl.LeshanServer;
 import org.eclipse.leshan.server.registration.Registration;
+import org.eclipse.leshan.server.registration.RegistrationService;
 
 import java.sql.Timestamp;
 
 public class GeneralHandler {
 
     private LeshanServer server;
+    private RegistrationService service;
 
     public GeneralHandler(LeshanServer server_src){
         this.server = server_src;
+        this.service = this.server.getRegistrationService();
     }
 
-    public void sendObserveRequest(Registration registration, int objectId, int objectInstanceId, int resourceId){
+    public void sendObserveRequest(String endpoint, int objectId, int objectInstanceId, int resourceId){
         try {
-            ObserveResponse response = this.server.send(registration, new ObserveRequest(objectId,objectInstanceId,resourceId));
+            Registration reg = this.service.getByEndpoint(endpoint);
+            ObserveResponse response = this.server.send(reg, new ObserveRequest(objectId,objectInstanceId,resourceId));
             if (response.isSuccess()) {
-                System.out.println("Observing: " + objectId + "/"+objectInstanceId + "/" + resourceId + " at " + registration.getEndpoint());
+                System.out.println("Observing: " + objectId + "/"+objectInstanceId + "/" + resourceId + " at " + reg.getEndpoint());
             }else {
                 System.out.println("Failed to observe: " + objectId + "/"+objectInstanceId + "/" + resourceId);
             }
@@ -29,11 +33,12 @@ public class GeneralHandler {
             e.printStackTrace();
         }
     }
-    public void sendExecuteRequest(Registration registration, int objectId, int objectInstanceId, int resourceId){
+    public void sendExecuteRequest(String endpoint, int objectId, int objectInstanceId, int resourceId){
         try {
-            ExecuteResponse response = this.server.send(registration, new ExecuteRequest(objectId,objectInstanceId,resourceId,String.format("{ \"sender\": \"SERVER\", \"receiver\": \"ROBOT\", \"timestamp\": \"%s\"}", new Timestamp(System.currentTimeMillis()))));
+            Registration reg = this.service.getByEndpoint(endpoint);
+            ExecuteResponse response = this.server.send(reg, new ExecuteRequest(objectId,objectInstanceId,resourceId,String.format("{ \"sender\": \"SERVER\", \"receiver\": \"ROBOT\", \"timestamp\": \"%s\"}", new Timestamp(System.currentTimeMillis()))));
             if (response.isSuccess()) {
-                System.out.println("Executing: " + objectId + "/"+objectInstanceId + "/" + resourceId + " at " + registration.getEndpoint());
+                System.out.println("Executing: " + objectId + "/"+objectInstanceId + "/" + resourceId + " at " + reg.getEndpoint());
             }else {
                 System.out.println("Failed to execute: " + objectId + "/"+objectInstanceId + "/" + resourceId);
             }

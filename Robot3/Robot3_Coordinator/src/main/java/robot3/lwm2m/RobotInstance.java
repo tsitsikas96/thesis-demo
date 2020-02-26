@@ -59,6 +59,7 @@ public class RobotInstance extends BaseInstanceEnabler {
         case 5:
             try {
                 orderQueue.put(true);
+//                return ExecuteResponse.success();
                 return addSignal(params, NewOrder.class);
             } catch (InterruptedException e) {
                 e.printStackTrace();

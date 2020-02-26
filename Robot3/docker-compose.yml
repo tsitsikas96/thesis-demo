@@ -7,8 +7,8 @@ networks:
 
 services:
   r3_assembly_coordinator:
-    # image: 192.168.10.105:5000/r3_assembly_coordinator:no_cushion
-    image: 127.0.0.1:5000/r3_assembly_coordinator:no_cushion
+    image: 192.168.10.105:5000/r3_assembly_coordinator:no_cushion
+    # image: 192.168.10.105:5000/r3_assembly_coordinator:with_cushion
     build:
       context: ./Robot3_Coordinator
       dockerfile: Dockerfile
@@ -26,8 +26,7 @@ services:
       - /tmp:/tmp
 
   workertask6:
-    # image: 192.168.10.105:5000/workertask6
-    image: 127.0.0.1:5000/workertask6
+    image: 192.168.10.105:5000/workertask6
     build:
       context: ./Worker_Task6
       dockerfile: Dockerfile
@@ -45,8 +44,7 @@ services:
       - PYTHONUNBUFFERED=1
 
   workertask7:
-    # image: 192.168.10.105:5000/workertask7
-    image: 127.0.0.1:5000/workertask7
+    image: 192.168.10.105:5000/workertask7
     build:
       context: ./Worker_Task7
       dockerfile: Dockerfile
@@ -64,8 +62,7 @@ services:
       - PYTHONUNBUFFERED=1
 
   workertask8:
-    # image: 192.168.10.105:5000/workertask8
-    image: 127.0.0.1:5000/workertask8
+    image: 192.168.10.105:5000/workertask8
     build:
       context: ./Worker_Task8
       dockerfile: Dockerfile
@@ -101,8 +98,7 @@ services:
   #     - PYTHONUNBUFFERED=1
 
   r3_controller:
-    # image: 192.168.10.105:5000/r3_controller
-    image: 127.0.0.1:5000/r3_controller
+    image: 192.168.10.105:5000/r3_controller
     build:
       context: ./RobotControllerMs
       dockerfile: Dockerfile

@@ -2,6 +2,7 @@ package robot1.fsm;
 
 import robot1.ConfigurationUtils;
 import robot1.Robot1CoordinatorApplication;
+import robot1.lwm2m.Robot;
 import robot1.lwm2m.RobotInstance;
 import robot1.unixsocket.UnixClient;
 import robot1.unixsocket.UnixServer;
@@ -42,6 +43,7 @@ public class Robot1Coordinator extends StateMachine{
         new Moving2P2_2_Wating4W2(moving2pos2,waiting4w2);
         new Wating4W2_2_SubAssW2(waiting4w2,subassw2);
         new SubAssW2_2_Moving2P1(subassw2,moving2pos1);
+//        new Moving2P1_2_Waiting4W1POS1(moving2pos1,waiting4w1pos1);
         new Moving2P1_2_Waiting4Order(moving2pos1,waiting4order);
         
         LOGGER = Logger.getLogger(Robot1Coordinator.class.getName() + " LOGGER");
@@ -58,7 +60,7 @@ public class Robot1Coordinator extends StateMachine{
 
         @Override
         protected void entry() {
-            robot1State = Robot1CoordinatorState.WAITING4ORDER;
+            robot1State = Robot1CoordinatorState.WAITING_4_ORDER;
             Robot1Coordinator.LOGGER.severe("R1: Assembly Coordinator State = " + robot1State + "\n");
             wait4Order();
         }
@@ -71,11 +73,6 @@ public class Robot1Coordinator extends StateMachine{
         @Override
         protected void exit() {
             orderReceived();
-            try {
-                Thread.sleep(750);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -83,6 +80,13 @@ public class Robot1Coordinator extends StateMachine{
 
         @Override
         protected void entry() {
+            while(RobotInstance.r3_dc){
+                try {
+                    RobotInstance.r3_disconnected.take();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
             SendAcquire2W1Pos1();
             robot1State = Robot1CoordinatorState.WAITING4W1POS1;
             Robot1Coordinator.LOGGER.severe("R1: Assembly Coordinator State = " + robot1State +"\n");
@@ -92,7 +96,7 @@ public class Robot1Coordinator extends StateMachine{
         protected void doActivity() { }
 
         @Override
-        protected void exit() { }
+        protected void exit() {}
     }
 
     private class SubAss1 extends State {
@@ -190,6 +194,12 @@ public class Robot1Coordinator extends StateMachine{
         protected void exit() {
             Robot1Coordinator.LOGGER.severe("R1: Notifying Configurator\n");
             Robot1CoordinatorApplication.robot1.robot1instance.fireResourcesChange(21);
+            try {
+                Thread.sleep(750);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
     }
 
@@ -281,6 +291,21 @@ public class Robot1Coordinator extends StateMachine{
         @Override
         protected boolean trigger(SMReception smReception) {
         	return (smReception instanceof SubAssW2Completed);
+        }
+
+        @Override
+        protected void effect() { }
+    }
+
+    private class Moving2P1_2_Waiting4W1POS1 extends Transition {
+
+        private Moving2P1_2_Waiting4W1POS1(State fromState, State toState) {
+            super(fromState, toState);
+        }
+
+        @Override
+        protected boolean trigger(SMReception smReception) {
+            return (smReception instanceof Pos1Reached);
         }
 
         @Override

@@ -1,8 +1,6 @@
 package listeners;
 
-import configurators.Robot1Configurator;
-import configurators.Robot2Configurator;
-import configurators.Robot3Configurator;
+import configurators.*;
 import handlers.GeneralHandler;
 import org.eclipse.leshan.core.observation.Observation;
 import org.eclipse.leshan.core.response.ObserveResponse;
@@ -12,12 +10,11 @@ import org.eclipse.leshan.server.registration.Registration;
 public class CustomObservationListener implements ObservationListener {
 
     private GeneralHandler handler;
+    public static long stop;
 
     public CustomObservationListener(GeneralHandler handler){
         this.handler = handler;
     }
-
-    public CustomObservationListener(){}
 
     @Override
     public void newObservation(Observation observation, Registration registration) {
@@ -29,17 +26,30 @@ public class CustomObservationListener implements ObservationListener {
     @Override
     public void onResponse(Observation observation, Registration registration, ObserveResponse observeResponse) {
         if (observeResponse.isSuccess()) {
-            System.out.println(registration.getEndpoint() + " finished");
             switch (registration.getEndpoint()){
                 case "Robot1":
-                    new Thread(new Robot1Configurator(this.handler,registration)).start();
+                    System.out.println("Robot 1 Finished chair: " + OrderUtils.robot1_chairs_made + " from order: " + Robot1Configurator.orders_made);
+                    try {
+                        Robot1Configurator.robot1_chairs_queue.put(true);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 case "Robot2":
-                    new Thread(new Robot2Configurator(this.handler,registration)).start();
+                  System.out.println("Robot 2 Finished chair: " + OrderUtils.robot2_chairs_made + " from order: " + Robot2Configurator.orders_made);
+                    try {
+                        Robot2Configurator.robot2_chairs_queue.put(true);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 case "Robot3":
-                    new Thread(new Robot3Configurator(this.handler,registration)).start();
-                    break;
+                    System.out.println("Robot 3 Finished chair: " + OrderUtils.robot3_chairs_made + " from order: " + Robot3Configurator.orders_made);
+                    try {
+                        Robot3Configurator.robot3_chairs_queue.put(true);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
             }
         }
         else {

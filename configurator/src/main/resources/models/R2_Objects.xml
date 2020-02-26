@@ -48,6 +48,26 @@
 				<Units>No units</Units>
 				<Description></Description>
 			</Item>
+			<Item ID="6">
+				<Name>R3 Disconnected</Name>
+				<Operations>E</Operations>
+				<MultipleInstances>Single</MultipleInstances>
+				<Mandatory>Optional</Mandatory>
+				<Type>Boolean</Type>
+				<RangeEnumeration></RangeEnumeration>
+				<Units>No units</Units>
+				<Description></Description>
+			</Item>
+			<Item ID="7">
+				<Name>R3 Reconnected</Name>
+				<Operations>E</Operations>
+				<MultipleInstances>Single</MultipleInstances>
+				<Mandatory>Optional</Mandatory>
+				<Type>Boolean</Type>
+				<RangeEnumeration></RangeEnumeration>
+				<Units>No units</Units>
+				<Description></Description>
+			</Item>
             <Item ID="16">
 				<Name>R2event2W</Name>
 				<Operations>R</Operations>

@@ -44,6 +44,7 @@ public class Robot2Coordinator extends StateMachine{
         new SubAssW2_2_Moving2P1(subassw2,moving2pos1);
         new Moving2P1_2_Waiting4W1POS2Part2(moving2pos1,waiting4w1pos2_part2);
         new Waiting4W1POS2Part2_2_completingSubAss2(waiting4w1pos2_part2,completingSubAss2);
+//        new CompletingSubAss2_2_Waiting4W1POS2(completingSubAss2 , waiting4w1pos2_part1);
         new CompletingSubAss2_2_Waiting4Order(completingSubAss2 , waiting4order);
 
         LOGGER = Logger.getLogger(Robot2Coordinator.class.getName() + " LOGGER");
@@ -74,11 +75,6 @@ public class Robot2Coordinator extends StateMachine{
         @Override
         protected void exit() {
             orderReceived();
-            try {
-                Thread.sleep(750);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -86,6 +82,13 @@ public class Robot2Coordinator extends StateMachine{
 
         @Override
         protected void entry() {
+            while(RobotInstance.r3_dc){
+                try {
+                    RobotInstance.r3_disconnected.take();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
             SendAcquire2W1Pos2();
             robot2State = Robot2CoordinatorState.WAITING_4_W1POS2_PART1;
             Robot2Coordinator.LOGGER.severe("R2: Assembly Coordinator State = " + robot2State +"\n");
@@ -228,14 +231,14 @@ public class Robot2Coordinator extends StateMachine{
         @Override
         protected void exit() {
             SendRelease2W1Pos2();
+            Robot2Coordinator.LOGGER.severe("R2: Notifying Configurator\n");
+            Robot2CoordinatorApplication.robot2.robot2instance.fireResourcesChange(21);
             try {
 				Thread.sleep(750);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-            Robot2Coordinator.LOGGER.severe("R2: Notifying Configurator\n");
-            Robot2CoordinatorApplication.robot2.robot2instance.fireResourcesChange(21);
         }
     }
 
@@ -371,6 +374,22 @@ public class Robot2Coordinator extends StateMachine{
         protected boolean trigger(SMReception smReception) {
             Robot2Coordinator.LOGGER.warning("R2: Event Reception = " + smReception +"\n");
             return (smReception instanceof W1Pos2Available);
+        }
+
+        @Override
+        protected void effect() { }
+    }
+
+    private class CompletingSubAss2_2_Waiting4W1POS2 extends Transition {
+
+        public CompletingSubAss2_2_Waiting4W1POS2(State fromState, State toState) {
+            super(fromState, toState);
+        }
+
+        @Override
+        protected boolean trigger(SMReception smReception) {
+            Robot2Coordinator.LOGGER.warning("R2: Event Reception = " + smReception +"\n");
+            return (smReception instanceof SubAss2_2Completed);
         }
 
         @Override

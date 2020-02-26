@@ -26,7 +26,7 @@ class PickAndFlipAndPress:
                 time.sleep(0.5)
                 # gpio.gpioControl('wrist_b', 1.2)
             elif device == "LAPTOP":
-                time.sleep(1)
+                time.sleep()
 
             print('PickAndFlipAndPress finished..')
             print('Replying to WT server...')

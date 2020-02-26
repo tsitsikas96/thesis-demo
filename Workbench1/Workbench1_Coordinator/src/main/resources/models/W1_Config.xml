@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LWM2M  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://openmobilealliance.org/tech/profiles/LWM2M.xsd">
+    <Object ObjectType="MODefinition">
+        <Name>W1 Config</Name>
+        <Description1></Description1>
+        <ObjectID>5000</ObjectID>
+        <ObjectURN>urn:oma:lwm2m:ext:5000</ObjectURN>
+        <MultipleInstances>Single</MultipleInstances>
+        <Mandatory>Mandatory</Mandatory>
+        <Resources>
+            <Item ID="5700">
+                <Name>order_received</Name>
+                <Operations>E</Operations>
+                <MultipleInstances>Single</MultipleInstances>
+                <Mandatory>Mandatory</Mandatory>
+                <Type>string</Type>
+                <RangeEnumeration></RangeEnumeration>
+                <Units>No units</Units>
+                <Description></Description>
+            </Item>
+        </Resources>
+        <Description2></Description2>
+    </Object>
+</LWM2M>

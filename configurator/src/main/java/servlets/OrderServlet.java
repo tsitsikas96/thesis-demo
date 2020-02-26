@@ -1,6 +1,6 @@
 package servlets;
 
-import servers.ConfiguratorTest;
+import servers.Configurator;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -24,10 +24,10 @@ public class OrderServlet extends HttpServlet {
     }
 
     private void insertOrder(String head_cushion, int quantity){
-        int head = 0;
-        if(head_cushion.matches("yes")){head = 1;}
+        boolean head = false;
+        if(head_cushion.matches("yes")){head = true;}
         try{
-            stmt = ConfiguratorTest.conn.createStatement();
+            stmt = Configurator.conn.createStatement();
             String sql = "INSERT INTO orders( head_cushion, quantity) " +
                     "VALUES (" + head +", "+quantity+")";
             stmt.executeUpdate(sql);

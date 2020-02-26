@@ -26,7 +26,9 @@ public class RobotInstance extends BaseInstanceEnabler {
     public static String event2sim;
     public static Robot2Coordinator robot2Coordinator;
     public static SignalDetector signaldetect;
-    public static BlockingQueue<Boolean> orderQueue = new ArrayBlockingQueue<Boolean>(1);
+    public static BlockingQueue<Boolean> orderQueue = new ArrayBlockingQueue<Boolean>(1),
+            r3_disconnected = new ArrayBlockingQueue<>(1);
+    public static boolean r3_dc = false;
     public RobotInstance(final Robot2Coordinator robot2Coordinator, String endpoint) {
     	this.robot2Coordinator = robot2Coordinator;
     	signaldetect = new SignalDetector(robot2Coordinator.itsMsgQ);
@@ -63,6 +65,17 @@ public class RobotInstance extends BaseInstanceEnabler {
             try {
                 orderQueue.put(true);
                 return addSignal(params, NewOrder.class);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        case 6:
+            r3_dc = true;
+            return ExecuteResponse.success();
+        case 7:
+            try {
+                r3_dc = false;
+                r3_disconnected.put(true);
+                return ExecuteResponse.success();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

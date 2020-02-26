@@ -1,12 +1,3 @@
-FROM maven:alpine as builder
-WORKDIR /build
-COPY pom.xml .
-RUN mvn dependency:go-offline
-
-COPY src/ /build/src/
-COPY mvnw .
-RUN mvn package
-
 # Debian 9(Stretch) base image
 FROM debian:9-slim
 
@@ -39,14 +30,12 @@ RUN export LANGUAGE=${LANG} && export LANG=${LANG} && \
      export JAVA_HOME=${JAVA_HOME} && \
      export PATH=$JAVA_HOME/jre/bin:$PATH
 
-ENV W1_COAP_SERVER 0.0.0.0
+# ENV W1_COAP_SERVER 0.0.0.0
 
+# Copy files
+COPY target/Workbench1_Coordinator-0.0.1-SNAPSHOT.jar /Workbench1Coordinator/Workbench1_Coordinator-0.0.1-SNAPSHOT.jar
 # Set working directory
 WORKDIR /Workbench1Coordinator
 
-# Copy files
-COPY --from=builder /build/target/Workbench1_Coordinator-0.0.1-SNAPSHOT.jar .
-# COPY target/Workbench1_Coordinator-0.0.1-SNAPSHOT.jar /Workbench1Coordinator/Workbench1_Coordinator-0.0.1-SNAPSHOT.jar
-
 # Final command
-ENTRYPOINT ["sh","-c","java -jar Workbench1_Coordinator-0.0.1-SNAPSHOT.jar ${W1_COAP_SERVER}"]
+ENTRYPOINT ["java", "-jar", "Workbench1_Coordinator-0.0.1-SNAPSHOT.jar", "0.0.0.0"]

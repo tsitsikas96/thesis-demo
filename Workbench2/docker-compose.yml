@@ -7,8 +7,7 @@ networks:
 
 services:
   w2-assembly-coordinator:
-    # image: 192.168.10.105:5000/w2_assembly_coordinator
-    image: 127.0.0.1:5000/w2_assembly_coordinator
+    image: 192.168.10.105:5000/w2_assembly_coordinator
     build:
       context: ./Workbench2_Coordinator
       dockerfile: Dockerfile
@@ -26,8 +25,7 @@ services:
       - /tmp:/tmp
     
   w2_controller:
-    # image: 192.168.10.105:5000/w2_controller
-    image: 127.0.0.1:5000/w2_controller
+    image: 192.168.10.105:5000/w2_controller
     build:
       context: ./Workbench2ControllerMs
       dockerfile: Dockerfile
