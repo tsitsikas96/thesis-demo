@@ -1,5 +1,6 @@
-package configurators;
+package servlets;
 
+import configurators.UnixClient;
 import handlers.GeneralHandler;
 import listeners.CustomObservationListener;
 import org.eclipse.leshan.server.registration.Registration;
@@ -10,10 +11,10 @@ import java.sql.Statement;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
-
-public class Configurator implements Runnable{
+public class OrderHandler implements Runnable {
 
     public static boolean all_connected = false;
+    public static int ROBOT1_CHAIRS, ROBOT2_CHAIRS, ROBOT3_CHAIRS;
     private static boolean previous_order = false,broken_loop = false;
     public static BlockingQueue<Boolean> orderqueue = new ArrayBlockingQueue<>(1);
     private GeneralHandler handler;
@@ -23,7 +24,7 @@ public class Configurator implements Runnable{
     private int INSTANCE = 0;
     private int NEW_ORDER = 5;
 
-    public Configurator(GeneralHandler handler, Registration[] registrations, UnixClient unix_client){
+    public OrderHandler(GeneralHandler handler, Registration[] registrations, UnixClient unix_client){
         this.registrations = registrations;
         this.handler = handler;
         this.unix_client = unix_client;
@@ -40,9 +41,9 @@ public class Configurator implements Runnable{
                 if(rs.next() != false){
                     boolean head_cushion = rs.getBoolean("head_cushion");
                     int quantity = rs.getInt("quantity");
-                    OrderUtils.ROBOT1_CHAIRS = quantity;
-//                    ROBOT2_CHAIRS = quantity;
-//                    ROBOT3_CHAIRS = quantity;
+                    ROBOT1_CHAIRS = quantity;
+                    ROBOT2_CHAIRS = quantity;
+                    ROBOT3_CHAIRS = quantity;
                     System.out.println("Order received");
                     if(!broken_loop){
                         this.handler.sendExecuteRequest(this.registrations[0],MODEL1,INSTANCE,NEW_ORDER);

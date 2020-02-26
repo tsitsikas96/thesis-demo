@@ -1,5 +1,8 @@
 package servers;
 
+import com.impossibl.postgres.api.jdbc.PGConnection;
+import com.impossibl.postgres.api.jdbc.PGNotificationListener;
+import com.impossibl.postgres.jdbc.PGDataSource;
 import listeners.CustomRegistrationListener;
 import org.eclipse.leshan.core.model.ObjectLoader;
 import org.eclipse.leshan.core.model.ObjectModel;
@@ -7,34 +10,52 @@ import org.eclipse.leshan.server.californium.LeshanServerBuilder;
 import org.eclipse.leshan.server.californium.impl.LeshanServer;
 import org.eclipse.leshan.server.model.LwM2mModelProvider;
 import org.eclipse.leshan.server.model.StaticModelProvider;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 public class ConfiguratorTest {
 
     private final static String[] modelPaths = new String[] {"R1_Objects.xml","R2_Objects.xml","R3_Objects.xml"};
     private static LeshanServer server;
     private static JettyServer httpserver;
-    static final String DB_URL = "jdbc:mysql://localhost:50000/gocas_shop";
+    static final String DB_URL = "jdbc:pgsql://localhost:50000/gocas_shop";
     static final String USER = "admin";
     static final String PASS = "qwe123";
-    public static Connection conn = null;
+    public static PGConnection conn = null;
+    private static PGNotificationListener listener;
+    private static PGDataSource dataSource;
+    public static BlockingQueue DBNotifacation = new ArrayBlockingQueue(1);
 
     public static LeshanServer createAndStartServer(){
 
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
+            listener = new PGNotificationListener() {
+                @Override
+                public void notification(int processId, String channelName, String payload) {
+                    DBNotifacation.add(true);
+//                    System.out.println("New order");
+                }
+            };
+            dataSource = new PGDataSource();
+            dataSource.setDatabaseUrl(DB_URL);
+            dataSource.setUser(USER);
+            dataSource.setPassword(PASS);
             System.out.println("Connecting to a selected database...");
-            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            conn = (PGConnection) dataSource.getConnection();
             System.out.println("Connected database successfully...");
+            conn.addNotificationListener(listener);
+            Statement statement = conn.createStatement();
+            statement.execute("LISTEN q_event");
+            statement.close();
         }
         catch(SQLException se){
             System.out.println("Please start database first");
         }
         catch(Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
 
         LeshanServerBuilder builder = new LeshanServerBuilder();
