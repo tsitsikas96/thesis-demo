@@ -40,6 +40,39 @@
         "description": ""
       },
       {
+        "id": 5,
+        "name": "new order",
+        "operations": "E",
+        "instancetype": "single",
+        "mandatory": false,
+        "type": "boolean",
+        "range": "",
+        "units": "",
+        "description": ""
+      },
+      {
+        "id": 6,
+        "name": "r3 disconnected",
+        "operations": "E",
+        "instancetype": "single",
+        "mandatory": false,
+        "type": "boolean",
+        "range": "",
+        "units": "",
+        "description": ""
+      },
+      {
+        "id": 7,
+        "name": "r3 reconnected",
+        "operations": "E",
+        "instancetype": "single",
+        "mandatory": false,
+        "type": "boolean",
+        "range": "",
+        "units": "",
+        "description": ""
+      },
+      {
         "id": 16,
         "name": "R2event2W",
         "operations": "R",
@@ -53,6 +86,17 @@
       {
         "id": 20,
         "name": "R2Event2Sim",
+        "operations": "R",
+        "instancetype": "single",
+        "mandatory": true,
+        "type": "string",
+        "range": "",
+        "units": "",
+        "description": ""
+      },
+      {
+        "id": 21,
+        "name": "RobotFinished",
         "operations": "R",
         "instancetype": "single",
         "mandatory": true,

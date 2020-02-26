@@ -22,7 +22,7 @@ class Move:
                     gpio.gpioControl('rotate_l', 2.6)
                     time.sleep(1)
                 elif device == "LAPTOP":
-                    time.sleep(1)
+                    time.sleep(3.6)
 
                 print('MoveMs finished..')
                 print('Replying to server...')
@@ -37,7 +37,7 @@ class Move:
                     gpio.gpioControl('rotate_r', 2.4)
                     time.sleep(1)
                 elif device == "LAPTOP":
-                    time.sleep(1)
+                    time.sleep(3.4)
 
                 print('MoveMs finished..')
                 print('Replying to server...')

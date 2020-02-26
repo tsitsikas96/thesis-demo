@@ -30,7 +30,7 @@ RUN export LANGUAGE=${LANG} && export LANG=${LANG} && \
      export JAVA_HOME=${JAVA_HOME} && \
      export PATH=$JAVA_HOME/jre/bin:$PATH
 
-ENV W1_COAP_SERVER 0.0.0.0
+# ENV W1_COAP_SERVER 0.0.0.0
 
 # Copy files
 COPY target/Workbench1_Coordinator-0.0.1-SNAPSHOT.jar /Workbench1Coordinator/Workbench1_Coordinator-0.0.1-SNAPSHOT.jar
@@ -38,4 +38,4 @@ COPY target/Workbench1_Coordinator-0.0.1-SNAPSHOT.jar /Workbench1Coordinator/Wor
 WORKDIR /Workbench1Coordinator
 
 # Final command
-ENTRYPOINT ["sh","-c","java -jar Workbench1_Coordinator-0.0.1-SNAPSHOT.jar ${W1_COAP_SERVER}"]
+ENTRYPOINT ["java", "-jar", "Workbench1_Coordinator-0.0.1-SNAPSHOT.jar", "0.0.0.0"]

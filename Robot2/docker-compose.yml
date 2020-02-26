@@ -7,7 +7,7 @@ networks:
 
 services:
   r2_assembly_coordinator:
-    image: 127.0.0.1:5000/r2_assembly_coordinator
+    image: 192.168.10.105:5000/r2_assembly_coordinator
     build:
         context: ./Robot2_Coordinator
         dockerfile: Dockerfile
@@ -15,7 +15,7 @@ services:
     deploy:
         placement:
             constraints:
-                - node.hostname==Robot2
+                - node.hostname==GOCASr2
         resources:
             limits:
                 memory: 500M
@@ -25,7 +25,7 @@ services:
         - /tmp:/tmp
 
   workertask2:
-    image: 127.0.0.1:5000/workertask2
+    image: 192.168.10.105:5000/workertask2
     build:
         context: ./WorkerTask2
         dockerfile: Dockerfile
@@ -33,7 +33,7 @@ services:
     deploy:
         placement:
             constraints:
-                - node.hostname==Robot2
+                - node.hostname==GOCASr2
         resources:
             limits:
                 memory: 500M
@@ -43,7 +43,7 @@ services:
         - PYTHONUNBUFFERED=1
 
   workertask3:
-    image: 127.0.0.1:5000/workertask3
+    image: 192.168.10.105:5000/workertask3
     build:
         context: ./WorkerTask3
         dockerfile: Dockerfile
@@ -51,7 +51,7 @@ services:
     deploy:
         placement:
             constraints:
-                - node.hostname==Robot2
+                - node.hostname==GOCASr2
         resources:
             limits:
                 memory: 500M
@@ -61,7 +61,7 @@ services:
         - PYTHONUNBUFFERED=1
 
   workertask5:
-    image: 127.0.0.1:5000/workertask5
+    image: 192.168.10.105:5000/workertask5
     build:
         context: ./WorkerTask5
         dockerfile: Dockerfile
@@ -69,7 +69,7 @@ services:
     deploy:
         placement:
             constraints:
-                - node.hostname==Robot2
+                - node.hostname==GOCASr2
         resources:
             limits:
                 memory: 500M
@@ -79,7 +79,7 @@ services:
         - PYTHONUNBUFFERED=1
 
   r2_controller:
-    image: 127.0.0.1:5000/r2_controller
+    image: 192.168.10.105:5000/r2_controller
     build:
         context: ./RobotControllerMs
         dockerfile: Dockerfile
@@ -87,13 +87,12 @@ services:
     deploy:
         placement:
             constraints:
-                - node.hostname==Robot2
+                - node.hostname==GOCASr2
         resources:
             limits:
                 memory: 500M
     volumes:
         - /tmp:/tmp
-    #   - /dev/gpiomem:/dev/gpiomem
-#   privileged: true
+        - /sys:/sys
     environment:
         - PYTHONUNBUFFERED=1

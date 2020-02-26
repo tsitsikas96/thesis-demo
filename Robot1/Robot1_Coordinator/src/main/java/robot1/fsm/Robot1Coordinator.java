@@ -2,6 +2,7 @@ package robot1.fsm;
 
 import robot1.ConfigurationUtils;
 import robot1.Robot1CoordinatorApplication;
+import robot1.lwm2m.Robot;
 import robot1.lwm2m.RobotInstance;
 import robot1.unixsocket.UnixClient;
 import robot1.unixsocket.UnixServer;
@@ -22,12 +23,13 @@ public class Robot1Coordinator extends StateMachine{
     public static boolean pos1avail=false;
     public static boolean w2avail=false;
 	public static BlockingQueue<SMReception> notificationQueue = new ArrayBlockingQueue<SMReception>(10);
-    private State waiting4w1pos1,subass1,moving2pos2,waiting4w2,subassw2,moving2pos1;
+    private State waiting4order,waiting4w1pos1,subass1,moving2pos2,waiting4w2,subassw2,moving2pos1;
     private static UnixClient unixClient = new UnixClient();
     UnixServer server = new UnixServer();
 
     public Robot1Coordinator(){
         super(null);
+        waiting4order = new Waiting4Order();
         waiting4w1pos1 = new Waiting4W1Pos1();
         subass1 = new SubAss1();
         moving2pos2 = new Moving2Pos2();
@@ -35,27 +37,56 @@ public class Robot1Coordinator extends StateMachine{
         subassw2 = new SubAssW2();
         moving2pos1 = new Moving2Pos1();
 
+        new Waiting4Order_2_Waiting4W1POS1(waiting4order,waiting4w1pos1);
         new Waiting4W1POS1_2_SubAss1(waiting4w1pos1,subass1);
         new SubAss1_2_Moving2P2(subass1,moving2pos2);
         new Moving2P2_2_Wating4W2(moving2pos2,waiting4w2);
         new Wating4W2_2_SubAssW2(waiting4w2,subassw2);
         new SubAssW2_2_Moving2P1(subassw2,moving2pos1);
-        new Moving2P1_2_Waiting4W1POS1(moving2pos1,waiting4w1pos1);
+//        new Moving2P1_2_Waiting4W1POS1(moving2pos1,waiting4w1pos1);
+        new Moving2P1_2_Waiting4Order(moving2pos1,waiting4order);
         
         LOGGER = Logger.getLogger(Robot1Coordinator.class.getName() + " LOGGER");
         LOGGER.info("\n ");
         LOGGER.setLevel(Level.ALL); // Request that every detail gets logged.
         LOGGER.info("Robot1 starting");
         server.start();
-        setInitState(waiting4w1pos1);
+//        setInitState(waiting4w1pos1);
+        setInitState(waiting4order);
     }
 
     //-----------------States----------------
+    private class Waiting4Order extends State{
+
+        @Override
+        protected void entry() {
+            robot1State = Robot1CoordinatorState.WAITING_4_ORDER;
+            Robot1Coordinator.LOGGER.severe("R1: Assembly Coordinator State = " + robot1State + "\n");
+            wait4Order();
+        }
+
+        @Override
+        protected void doActivity() {
+
+        }
+
+        @Override
+        protected void exit() {
+            orderReceived();
+        }
+    }
 
     private class Waiting4W1Pos1 extends State {
 
         @Override
         protected void entry() {
+            while(RobotInstance.r3_dc){
+                try {
+                    RobotInstance.r3_disconnected.take();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
             SendAcquire2W1Pos1();
             robot1State = Robot1CoordinatorState.WAITING4W1POS1;
             Robot1Coordinator.LOGGER.severe("R1: Assembly Coordinator State = " + robot1State +"\n");
@@ -65,7 +96,7 @@ public class Robot1Coordinator extends StateMachine{
         protected void doActivity() { }
 
         @Override
-        protected void exit() { }
+        protected void exit() {}
     }
 
     private class SubAss1 extends State {
@@ -160,11 +191,35 @@ public class Robot1Coordinator extends StateMachine{
         protected void doActivity() { }
 
         @Override
-        protected void exit() { }
+        protected void exit() {
+            Robot1Coordinator.LOGGER.severe("R1: Notifying Configurator\n");
+            Robot1CoordinatorApplication.robot1.robot1instance.fireResourcesChange(21);
+            try {
+                Thread.sleep(750);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
     }
 
 
     //---------------------Transitions----------------
+
+    private class Waiting4Order_2_Waiting4W1POS1 extends Transition{
+
+        public Waiting4Order_2_Waiting4W1POS1(State fromState, State toState){super(fromState,toState);}
+
+        @Override
+        protected boolean trigger(SMReception smReception) {
+            return (smReception instanceof NewOrder);
+        }
+
+        @Override
+        protected void effect() {
+
+        }
+    }
 
     private class Waiting4W1POS1_2_SubAss1 extends Transition {
 
@@ -245,6 +300,21 @@ public class Robot1Coordinator extends StateMachine{
     private class Moving2P1_2_Waiting4W1POS1 extends Transition {
 
         private Moving2P1_2_Waiting4W1POS1(State fromState, State toState) {
+            super(fromState, toState);
+        }
+
+        @Override
+        protected boolean trigger(SMReception smReception) {
+            return (smReception instanceof Pos1Reached);
+        }
+
+        @Override
+        protected void effect() { }
+    }
+
+    private class Moving2P1_2_Waiting4Order extends Transition {
+
+        private Moving2P1_2_Waiting4Order(State fromState, State toState) {
             super(fromState, toState);
         }
 
@@ -346,6 +416,33 @@ public class Robot1Coordinator extends StateMachine{
         }
 
         callAT4();
+    }
+
+    private void wait4Order(){
+        Robot1Coordinator.LOGGER.warning("Waiting for order...\n");
+        try {
+            RobotInstance.event =new JSONObject()
+                    .put("event", "R1_WAIT_4_ORDER")
+                    .put("value", "").toString();
+            RobotInstance.orderQueue.take();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void orderReceived(){
+        Robot1Coordinator.LOGGER.warning("Order Received. Moving on..."+"\n");
+        try{
+            RobotInstance.event2sim = new JSONObject()
+                    .put("event2sim", "R1_ORDER_RECEIVED")
+                    .put("value","").toString();
+        }
+        catch (JSONException e){
+            e.printStackTrace();
+        }
     }
 
     private void wait4w1pos1() {

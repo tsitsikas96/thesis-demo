@@ -7,7 +7,7 @@ networks:
 
 services:
   w2-assembly-coordinator:
-    image: 127.0.0.1:5000/w2_assembly_coordinator
+    image: 192.168.10.105:5000/w2_assembly_coordinator
     build:
       context: ./Workbench2_Coordinator
       dockerfile: Dockerfile
@@ -15,7 +15,7 @@ services:
     deploy:
       placement:
           constraints:
-              - node.hostname==Workbench2
+              - node.hostname==GOCASw2
       resources:
           limits:
               memory: 500M
@@ -23,10 +23,9 @@ services:
       - gocas-mgmt
     volumes:
       - /tmp:/tmp
-    # privileged: true
     
   w2_controller:
-    image: 127.0.0.1:5000/w2_controller
+    image: 192.168.10.105:5000/w2_controller
     build:
       context: ./Workbench2ControllerMs
       dockerfile: Dockerfile
@@ -34,13 +33,12 @@ services:
     deploy:
       placement:
           constraints:
-              - node.hostname==Workbench2
+              - node.hostname==GOCASw2
       resources:
           limits:
               memory: 500M
     volumes:
       - /tmp:/tmp
-      # - /dev/gpiomem:/dev/gpiomem
-    # privileged: true
+      - /sys:/sys
     environment:
       - PYTHONUNBUFFERED=1

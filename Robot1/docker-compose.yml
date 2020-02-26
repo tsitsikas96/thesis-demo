@@ -7,7 +7,7 @@ networks:
 
 services: 
     r1_assembly_coordinator:
-        image: 127.0.0.1:5000/r1_assembly_coordinator
+        image: 192.168.10.105:5000/r1_assembly_coordinator
         build:
             context: ./Robot1_Coordinator
             dockerfile: Dockerfile
@@ -15,7 +15,7 @@ services:
         deploy:
             placement:
                 constraints:
-                    - node.hostname==Robot1
+                    - node.hostname==GOCASr1
             resources:
                 limits:
                     memory: 500M
@@ -25,7 +25,7 @@ services:
             - /tmp:/tmp
 
     workertask1:
-        image: 127.0.0.1:5000/workertask1
+        image: 192.168.10.105:5000/workertask1
         build:
             context: ./WorkerTask1
             dockerfile: Dockerfile
@@ -33,7 +33,7 @@ services:
         deploy:
             placement:
                 constraints:
-                    - node.hostname==Robot1
+                    - node.hostname==GOCASr1
             resources:
                 limits:
                     memory: 500M
@@ -43,7 +43,7 @@ services:
             - PYTHONUNBUFFERED=1
 
     workertask4:
-        image: 127.0.0.1:5000/workertask4
+        image: 192.168.10.105:5000/workertask4
         build:
             context: ./WorkerTask4
             dockerfile: Dockerfile
@@ -51,7 +51,7 @@ services:
         deploy:
             placement:
                 constraints:
-                    - node.hostname==Robot1
+                    - node.hostname==GOCASr1
             resources:
                 limits:
                     memory: 500M
@@ -61,7 +61,7 @@ services:
             - PYTHONUNBUFFERED=1
 
     r1_controller:
-        image: 127.0.0.1:5000/r1_controller
+        image: 192.168.10.105:5000/r1_controller
         build:
             context: ./RobotControllerMs
             dockerfile: Dockerfile
@@ -69,13 +69,12 @@ services:
         deploy:
             placement:
                 constraints:
-                    - node.hostname==Robot1
+                    - node.hostname==GOCASr1
             resources:
                 limits:
                     memory: 500M
         volumes:
             - /tmp:/tmp
-            # - /dev/gpiomem:/dev/gpiomemoc
-        # privileged: true
+            - /sys:/sys
         environment:
             - PYTHONUNBUFFERED=1

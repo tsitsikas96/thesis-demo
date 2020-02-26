@@ -1,10 +1,15 @@
 import time
 
 
-out1 = 13
-out2 = 11
-out3 = 15
-out4 = 12
+# out1 = 13
+# out2 = 11
+# out3 = 15
+# out4 = 12
+
+out1 = 27
+out2 = 17
+out3 = 22
+out4 = 18
 
 
 class Rotate:
@@ -18,7 +23,7 @@ class Rotate:
         try:
             print('doing Rotate')
             if device == "RPI":
-                import RPi.GPIO as GPIO
+                import gpio as GPIO
                 self.initPins(GPIO)
                 self.rotate(GPIO)
             elif device == "LAPTOP":
@@ -34,7 +39,7 @@ class Rotate:
 
     def initPins(self,GPIO):
         GPIO.setwarnings(False)
-        GPIO.setmode(GPIO.BOARD)
+        # GPIO.setmode(GPIO.BOARD)
         GPIO.setup(out1, GPIO.OUT)
         GPIO.setup(out2, GPIO.OUT)
         GPIO.setup(out3, GPIO.OUT)

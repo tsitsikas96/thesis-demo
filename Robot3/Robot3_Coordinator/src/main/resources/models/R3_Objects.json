@@ -29,6 +29,17 @@
         "description": ""
       },
       {
+        "id": 5,
+        "name": "new order",
+        "operations": "E",
+        "instancetype": "single",
+        "mandatory": false,
+        "type": "boolean",
+        "range": "",
+        "units": "",
+        "description": ""
+      },
+      {
         "id": 16,
         "name": "R3event2W",
         "operations": "R",
@@ -42,6 +53,17 @@
       {
         "id": 20,
         "name": "R3Event2Sim",
+        "operations": "R",
+        "instancetype": "single",
+        "mandatory": true,
+        "type": "string",
+        "range": "",
+        "units": "",
+        "description": ""
+      },
+      {
+        "id": 21,
+        "name": "RobotDone",
         "operations": "R",
         "instancetype": "single",
         "mandatory": true,

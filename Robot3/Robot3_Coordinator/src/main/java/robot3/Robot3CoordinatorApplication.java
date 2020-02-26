@@ -1,5 +1,7 @@
 package robot3;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -26,11 +28,6 @@ public class Robot3CoordinatorApplication {
 				e.printStackTrace();
 			}
 			new Thread(RobotInstance.robot3Ctrl).start();
-			/*try {
-				robot3controller.workOnW1();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}*/
 		}
 		else{
 			System.out.println("Please insert 2 parameter for w1server,configurator");

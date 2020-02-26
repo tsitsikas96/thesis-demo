@@ -16,7 +16,7 @@ import robot3.fsm.Robot3Coordinator;
 
 public class Robot extends AbstractDevice{
 
-	public RobotInstance robot2instance;
+	public RobotInstance robot3instance;
 	Robot3Coordinator controller;
 	
 	 protected LwM2mInstanceEnablerFactory defaultFactory = new LwM2mInstanceEnablerFactory() {
@@ -31,7 +31,7 @@ public class Robot extends AbstractDevice{
 	public Robot(String endpoint, Robot3Coordinator controller, String[] args) {
         super(endpoint, args);
         this.controller = controller;
-        robot2instance = new RobotInstance(controller, endpoint);
+        robot3instance = new RobotInstance(controller, endpoint);
     }
 
 	 @Override
@@ -44,7 +44,7 @@ public class Robot extends AbstractDevice{
 	        List<LwM2mObjectEnabler> superEnablers = super.getEnablers(initializer );
 
 	        Map<Integer, LwM2mInstanceEnabler> instances = new HashMap<>();
-	        instances.put(0, robot2instance);
+	        instances.put(0, robot3instance);
 	        ObjectModel robot1Model = getLwM2mModel().getObjectModel(RobotInstance.modelId);
 	        RobotObject robot1Object = new RobotObject(RobotInstance.modelId, robot1Model, instances, defaultFactory, ContentFormat.JSON);
 

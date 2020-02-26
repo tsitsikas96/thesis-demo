@@ -1,38 +1,19 @@
 package listeners;
 
-import com.github.dockerjava.api.DockerClient;
-import com.github.dockerjava.api.command.CreateContainerCmd;
-import com.github.dockerjava.api.command.CreateContainerResponse;
-import com.github.dockerjava.api.command.DockerCmdExecFactory;
-import com.github.dockerjava.api.model.Container;
-import com.github.dockerjava.api.model.ExposedPort;
-import com.github.dockerjava.api.model.Info;
-import com.github.dockerjava.core.DefaultDockerClientConfig;
-import com.github.dockerjava.core.DockerClientBuilder;
-import com.github.dockerjava.core.DockerClientConfig;
-import com.github.dockerjava.core.command.WaitContainerResultCallback;
-import com.github.dockerjava.jaxrs.JerseyDockerCmdExecFactory;
-import com.github.dockerjava.jaxrs.StopContainerCmdExec;
-import org.eclipse.leshan.core.node.LwM2mResource;
+import configurators.*;
+import handlers.GeneralHandler;
 import org.eclipse.leshan.core.observation.Observation;
 import org.eclipse.leshan.core.response.ObserveResponse;
 import org.eclipse.leshan.server.observation.ObservationListener;
 import org.eclipse.leshan.server.registration.Registration;
 
-import java.util.concurrent.BlockingQueue;
-
 public class CustomObservationListener implements ObservationListener {
 
-    private DockerClient dockerClient1;
-    private DockerClient dockerClient2;
-    private BlockingQueue<Boolean> msgQueue1;
-    private BlockingQueue<Boolean> msgQueue2;
+    private GeneralHandler handler;
+    public static long stop;
 
-    public CustomObservationListener(DockerClient dockerClient1, DockerClient dockerClient2, BlockingQueue<Boolean> msgQueue1, BlockingQueue<Boolean> msgQueue2){
-        this.dockerClient1 = dockerClient1;
-        this.dockerClient2 = dockerClient2;
-        this.msgQueue1 = msgQueue1;
-        this.msgQueue2 = msgQueue2;
+    public CustomObservationListener(GeneralHandler handler){
+        this.handler = handler;
     }
 
     @Override
@@ -45,28 +26,30 @@ public class CustomObservationListener implements ObservationListener {
     @Override
     public void onResponse(Observation observation, Registration registration, ObserveResponse observeResponse) {
         if (observeResponse.isSuccess()) {
-            System.out.println("Blink Complete "+ registration.getEndpoint() + ": " + ((LwM2mResource)observeResponse.getContent()).getValue());
             switch (registration.getEndpoint()){
-                case "Node 1":
-                    this.dockerClient1.stopContainerCmd("node_1").exec();
-                    this.dockerClient1.removeContainerCmd("node_1").exec();
+                case "Robot1":
+                    System.out.println("Robot 1 Finished chair: " + OrderUtils.robot1_chairs_made + " from order: " + Robot1Configurator.orders_made);
                     try {
-                        this.msgQueue1.put(true);
+                        Robot1Configurator.robot1_chairs_queue.put(true);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    System.out.println("DOULEPSE NODE 1");
                     break;
-                case "Node 2":
-                    this.dockerClient2.stopContainerCmd("node_2").exec();
-                    this.dockerClient2.removeContainerCmd("node_2").exec();
+                case "Robot2":
+                  System.out.println("Robot 2 Finished chair: " + OrderUtils.robot2_chairs_made + " from order: " + Robot2Configurator.orders_made);
                     try {
-                        this.msgQueue2.put(true);
+                        Robot2Configurator.robot2_chairs_queue.put(true);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    System.out.println("DOULEPSE NODE 2");
                     break;
+                case "Robot3":
+                    System.out.println("Robot 3 Finished chair: " + OrderUtils.robot3_chairs_made + " from order: " + Robot3Configurator.orders_made);
+                    try {
+                        Robot3Configurator.robot3_chairs_queue.put(true);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
             }
         }
         else {
@@ -76,6 +59,5 @@ public class CustomObservationListener implements ObservationListener {
 
     @Override
     public void onError(Observation observation, Registration registration, Exception e) {}
-
 
 }

@@ -1,4 +1,4 @@
-import RPi.GPIO as GPIO
+import gpio as GPIO
 import time
 
 
@@ -13,7 +13,7 @@ class GpioController:
 
     def initPins(self):
         GPIO.cleanup()
-        GPIO.setmode(GPIO.BCM)
+        # GPIO.setmode(GPIO.BCM)
         for pin in self.gpioDict.values():
             GPIO.setup(pin, GPIO.OUT)
             GPIO.output(pin, 0)

@@ -1,14 +1,7 @@
 package listeners;
 
-import com.github.dockerjava.api.DockerClient;
-import com.github.dockerjava.api.command.DockerCmdExecFactory;
-import com.github.dockerjava.api.model.ExposedPort;
-import com.github.dockerjava.core.DefaultDockerClientConfig;
-import com.github.dockerjava.core.DockerClientBuilder;
-import com.github.dockerjava.core.DockerClientConfig;
-import com.github.dockerjava.jaxrs.JerseyDockerCmdExecFactory;
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import handlers.NodeHandler;
+import configurators.*;
+import handlers.GeneralHandler;
 import org.eclipse.leshan.core.observation.Observation;
 import org.eclipse.leshan.server.californium.impl.LeshanServer;
 import org.eclipse.leshan.server.registration.Registration;
@@ -16,61 +9,72 @@ import org.eclipse.leshan.server.registration.RegistrationListener;
 import org.eclipse.leshan.server.registration.RegistrationUpdate;
 
 import java.util.Collection;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
+import java.util.LinkedList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class CustomRegistrationListener implements RegistrationListener {
 
     private LeshanServer server;
-    private CustomObservationListener obsListener;
-//    private final BlockingQueue<Boolean> messageQueue1;
-//    private final BlockingQueue<Boolean> messageQueue2;
-//    private final DockerClient dockerClient1;
-//    private final DockerClient dockerClient2;
+    private GeneralHandler handler;
+    private int MODEL1 = 20000,MODEL2 = 20001, MODEL3 = 20002;
+    private int INSTANCE = 0;
+    private int ROBOT_FINISHED = 21;
+    private int connections = 0;
+    private UnixClient unixClient;
+    private boolean order_handler_up = false;
+    private volatile LinkedList<Boolean> orders_in_progress_robot3 = new LinkedList();
+    private volatile LinkedList<Integer> chairs_in_orders_robot1 = new LinkedList();
+    private volatile LinkedList<Integer> chairs_in_orders_robot2 = new LinkedList();
+    private volatile LinkedList<Integer> chairs_in_orders_robot3 = new LinkedList();
+    private static boolean Thread3_started = false;
 
     public CustomRegistrationListener(LeshanServer server){
-//        this.server = server;
-//        this.dockerClient1 = createDockerClient("192.168.99.100","node1");
-//        this.dockerClient2 = createDockerClient("192.168.99.103","node2");
-//        this.messageQueue1 = new ArrayBlockingQueue<Boolean>(1);
-//        this.messageQueue2 = new ArrayBlockingQueue<Boolean>(1);
-//        this.obsListener = new CustomObservationListener(this.dockerClient1,this.dockerClient2,this.messageQueue1,this.messageQueue2);
-//        server.getObservationService().addListener(obsListener);
+        this.server = server;
+        this.handler = new GeneralHandler(this.server);
+        this.server.getObservationService().addListener(new CustomObservationListener(this.handler));
+        this.unixClient = new UnixClient();
     }
-
-//    private DockerClient createDockerClient(String ip,String machineName){
-//        DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder()
-//                .withDockerHost("tcp://"+ ip +":2376")
-//                .withDockerTlsVerify(true)
-//                .withDockerCertPath("/home/ilias/.docker/machine/machines/"+machineName)
-//                .build();
-//
-//// using jaxrs/jersey implementation here (netty impl is also available)
-//        DockerCmdExecFactory dockerCmdExecFactory = new JerseyDockerCmdExecFactory()
-//                .withReadTimeout(5000)
-//                .withConnectTimeout(1000)
-//                .withMaxTotalConnections(100)
-//                .withMaxPerRouteConnections(10);
-//
-//        DockerClient dockerClient = DockerClientBuilder.getInstance(config)
-//                .withDockerCmdExecFactory(dockerCmdExecFactory)
-//                .build();
-//        return dockerClient;
-//    }
 
     @Override
     public void registered(Registration registration, Registration previousReg,
-                           Collection<Observation> previousObsersations) {
+                           Collection<Observation> previousObservations) {
         System.out.println("New Device: " + registration.getEndpoint());
-//        switch (registration.getEndpoint()){
-//            case "Node 1":
-//                new Thread(new NodeHandler(this.server,registration,0,this.dockerClient1,this.messageQueue1)).start();
-//                break;
-//            case "Node 2":
-//                new Thread(new NodeHandler(this.server,registration,1,this.dockerClient2,this.messageQueue2)).start();
-//                break;
-//        }
-
+        this.connections++;
+        switch (registration.getEndpoint()){
+            case "Robot1":
+                Robot1Configurator.R1_Connected = true;
+                this.handler.sendObserveRequest("Robot1",MODEL1,INSTANCE,ROBOT_FINISHED);
+                new Thread(new Robot1Configurator(this.handler,this.chairs_in_orders_robot1)).start();
+                break;
+            case "Robot2":
+                Robot2Configurator.R2_Connected = true;
+                this.handler.sendObserveRequest("Robot2",MODEL2,INSTANCE,ROBOT_FINISHED);
+                new Thread(new Robot2Configurator(this.handler,this.chairs_in_orders_robot2)).start();
+                break;
+            case "Robot3":
+                this.handler.sendObserveRequest("Robot3",MODEL3,INSTANCE,ROBOT_FINISHED);
+                if(!Thread3_started){
+                    Thread3_started = true;
+                    new Thread(new Robot3Configurator(this.handler,this.unixClient,this.chairs_in_orders_robot3,
+                            this.orders_in_progress_robot3)).start();
+                }
+                if(Robot3Configurator.robot3_left){
+                    try {
+                        Robot3Configurator.robot3_disconnect_queue.put(true);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    Robot3Configurator.robot3_left = false;
+                }
+                break;
+        }
+        if(this.connections==3 & !order_handler_up){
+            OrderHandler.all_connected = true;
+            new Thread(new OrderHandler(this.chairs_in_orders_robot1,this.chairs_in_orders_robot2,
+                    this.chairs_in_orders_robot3,this.orders_in_progress_robot3)).start();
+            order_handler_up = true;
+        }
     }
     @Override
     public void updated(RegistrationUpdate update, Registration updatedReg, Registration previousReg) {
@@ -80,5 +84,10 @@ public class CustomRegistrationListener implements RegistrationListener {
     public void unregistered(Registration registration, Collection<Observation> observations, boolean expired,
                              Registration newReg) {
         System.out.println("Device left: " + registration.getEndpoint());
+        if(registration.getEndpoint().matches("Robot3")){
+            Robot3Configurator.robot3_left = true;
+        }
+        this.connections--;
+
     }
 }

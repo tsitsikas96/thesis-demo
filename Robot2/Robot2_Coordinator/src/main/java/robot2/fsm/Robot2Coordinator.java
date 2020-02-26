@@ -1,6 +1,7 @@
 package robot2.fsm;
 import robot2.ConfigurationUtils;
 import robot2.Robot2CoordinatorApplication;
+import robot2.fsm.signals.*;
 import robot2.unixsocket.UnixClient;
 import robot2.unixsocket.UnixServer;
 import uml4iot.GenericStateMachine.core.*;
@@ -11,13 +12,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
-import robot2.fsm.signals.Pos1Reached;
-import robot2.fsm.signals.Pos2Reached;
-import robot2.fsm.signals.SubAss2_1Completed;
-import robot2.fsm.signals.SubAss2_2Completed;
-import robot2.fsm.signals.SubAssW2Completed;
-import robot2.fsm.signals.W1Pos2Available;
-import robot2.fsm.signals.W2Available;
 import robot2.lwm2m.RobotInstance;
 
 
@@ -26,12 +20,13 @@ public class Robot2Coordinator extends StateMachine{
     public static Logger LOGGER;
     public static boolean pos2avail=false;
     public static BlockingQueue<SMReception> notificationQueue;
-    State waiting4w1pos2_part1,subass2,moving2pos2,waiting4w2,subassw2,moving2pos1,waiting4w1pos2_part2,completingSubAss2;
+    State waiting4order,waiting4w1pos2_part1,subass2,moving2pos2,waiting4w2,subassw2,moving2pos1,waiting4w1pos2_part2,completingSubAss2;
     private static UnixClient unixClient = new UnixClient();
     UnixServer server = new UnixServer();
     public Robot2Coordinator(){
         super(null);
         notificationQueue = new ArrayBlockingQueue<SMReception>(10);
+        waiting4order = new Waiting4Order();
         waiting4w1pos2_part1 = new Waiting4W1Pos2_Part1();
         subass2 = new SubAss2_Part1();
         moving2pos2 = new Moving2Pos2();
@@ -41,6 +36,7 @@ public class Robot2Coordinator extends StateMachine{
         waiting4w1pos2_part2 = new Waiting4W1Pos2_Part2();
         completingSubAss2 = new CompletingSubAss2();
 
+        new Waiting4Order_2_Waiting4W1POS2Part1(waiting4order,waiting4w1pos2_part1);
         new Waiting4W1POS2Part1_2_SubAss2(waiting4w1pos2_part1,subass2);
         new SubAss2_2_Moving2P2(subass2,moving2pos2);
         new Moving2P2_2_Wating4W2(moving2pos2,waiting4w2);
@@ -48,23 +44,51 @@ public class Robot2Coordinator extends StateMachine{
         new SubAssW2_2_Moving2P1(subassw2,moving2pos1);
         new Moving2P1_2_Waiting4W1POS2Part2(moving2pos1,waiting4w1pos2_part2);
         new Waiting4W1POS2Part2_2_completingSubAss2(waiting4w1pos2_part2,completingSubAss2);
-        new CompletingSubAss2_2_Waiting4W1POS2(completingSubAss2 , waiting4w1pos2_part1);
+//        new CompletingSubAss2_2_Waiting4W1POS2(completingSubAss2 , waiting4w1pos2_part1);
+        new CompletingSubAss2_2_Waiting4Order(completingSubAss2 , waiting4order);
 
         LOGGER = Logger.getLogger(Robot2Coordinator.class.getName() + " LOGGER");
         LOGGER.info("\n");
         LOGGER.setLevel(Level.ALL); // Request that every detail gets logged.
         LOGGER.info("Robot2 starting");
         server.start();
-        setInitState(waiting4w1pos2_part1);
+//        setInitState(waiting4w1pos2_part1);
+        setInitState(waiting4order);
         Robot2Coordinator.LOGGER.severe("R2: Assembly Coordinator State = " + robot2State +"\n");
     }
 
     //-----------------States----------------
+    private class Waiting4Order extends State{
+
+        @Override
+        protected void entry() {
+            robot2State = Robot2CoordinatorState.WAITING_4_ORDER;
+            Robot2Coordinator.LOGGER.severe("R1: Assembly Coordinator State = " + robot2State + "\n");
+            wait4Order();
+        }
+
+        @Override
+        protected void doActivity() {
+
+        }
+
+        @Override
+        protected void exit() {
+            orderReceived();
+        }
+    }
 
     public class Waiting4W1Pos2_Part1 extends State {
 
         @Override
         protected void entry() {
+            while(RobotInstance.r3_dc){
+                try {
+                    RobotInstance.r3_disconnected.take();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
             SendAcquire2W1Pos2();
             robot2State = Robot2CoordinatorState.WAITING_4_W1POS2_PART1;
             Robot2Coordinator.LOGGER.severe("R2: Assembly Coordinator State = " + robot2State +"\n");
@@ -207,6 +231,8 @@ public class Robot2Coordinator extends StateMachine{
         @Override
         protected void exit() {
             SendRelease2W1Pos2();
+            Robot2Coordinator.LOGGER.severe("R2: Notifying Configurator\n");
+            Robot2CoordinatorApplication.robot2.robot2instance.fireResourcesChange(21);
             try {
 				Thread.sleep(750);
 			} catch (InterruptedException e) {
@@ -218,6 +244,22 @@ public class Robot2Coordinator extends StateMachine{
 
 
     //---------------------Transitions----------------
+    class Waiting4Order_2_Waiting4W1POS2Part1 extends Transition {
+
+
+        public Waiting4Order_2_Waiting4W1POS2Part1(State fromState, State toState) {
+            super(fromState, toState);
+        }
+
+        @Override
+        protected boolean trigger(SMReception smReception) {
+            Robot2Coordinator.LOGGER.warning("R2: Event Reception = " + smReception +"\n");
+            return (smReception instanceof NewOrder);
+        }
+
+        @Override
+        protected void effect() { }
+    }
 
     class Waiting4W1POS2Part1_2_SubAss2 extends Transition {
 
@@ -354,7 +396,49 @@ public class Robot2Coordinator extends StateMachine{
         protected void effect() { }
     }
 
+    private class CompletingSubAss2_2_Waiting4Order extends Transition {
+
+        public CompletingSubAss2_2_Waiting4Order(State fromState, State toState) {
+            super(fromState, toState);
+        }
+
+        @Override
+        protected boolean trigger(SMReception smReception) {
+            Robot2Coordinator.LOGGER.warning("R2: Event Reception = " + smReception +"\n");
+            return (smReception instanceof SubAss2_2Completed);
+        }
+
+        @Override
+        protected void effect() { }
+    }
+
     //--------------------- functions -------------------------------------------
+    private void wait4Order(){
+        Robot2Coordinator.LOGGER.warning("Waiting for order...\n");
+        try {
+            RobotInstance.event =new JSONObject()
+                    .put("event", "R2_WAIT_4_ORDER")
+                    .put("value", "").toString();
+            RobotInstance.orderQueue.take();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void orderReceived(){
+        Robot2Coordinator.LOGGER.warning("Order Received. Moving on..."+"\n");
+        try{
+            RobotInstance.event2sim = new JSONObject()
+                    .put("event2sim", "R2_ORDER_RECEIVED")
+                    .put("value","").toString();
+        }
+        catch (JSONException e){
+            e.printStackTrace();
+        }
+    }
 
     private void SendAcquire2W1Pos2(){
         Robot2Coordinator.LOGGER.warning("Now Sending Acquire message to W1 for Pos2.."+"\n");

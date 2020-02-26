@@ -10,9 +10,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import robot2.fsm.Robot2Coordinator;
 import robot2.fsm.SignalDetector;
+import robot2.fsm.signals.NewOrder;
 import robot2.fsm.signals.W1Pos2Available;
 import robot2.fsm.signals.W2Available;
 import uml4iot.GenericStateMachine.core.BaseSignal;
+
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 public class RobotInstance extends BaseInstanceEnabler {
 
@@ -22,6 +26,9 @@ public class RobotInstance extends BaseInstanceEnabler {
     public static String event2sim;
     public static Robot2Coordinator robot2Coordinator;
     public static SignalDetector signaldetect;
+    public static BlockingQueue<Boolean> orderQueue = new ArrayBlockingQueue<Boolean>(1),
+            r3_disconnected = new ArrayBlockingQueue<>(1);
+    public static boolean r3_dc = false;
     public RobotInstance(final Robot2Coordinator robot2Coordinator, String endpoint) {
     	this.robot2Coordinator = robot2Coordinator;
     	signaldetect = new SignalDetector(robot2Coordinator.itsMsgQ);
@@ -37,8 +44,10 @@ public class RobotInstance extends BaseInstanceEnabler {
             return ReadResponse.success(resourceid, getStatus());
         case 16:
             return ReadResponse.success(resourceid,event);
-         case 20:
+        case 20:
             return ReadResponse.success(resourceid,event2sim);
+        case 21:
+            return ReadResponse.success(resourceid,"Robot2 Done");
         default:
             return super.read(identity,resourceid);
         }
@@ -52,6 +61,24 @@ public class RobotInstance extends BaseInstanceEnabler {
             return addSignal(params, W1Pos2Available.class);
         case 4:    //setw2Available
             return addSignal(params, W2Available.class);
+        case 5:
+            try {
+                orderQueue.put(true);
+                return addSignal(params, NewOrder.class);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        case 6:
+            r3_dc = true;
+            return ExecuteResponse.success();
+        case 7:
+            try {
+                r3_dc = false;
+                r3_disconnected.put(true);
+                return ExecuteResponse.success();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         default:
             return execute(identity,resourceid, params);
         }
@@ -78,6 +105,9 @@ public class RobotInstance extends BaseInstanceEnabler {
                 return ExecuteResponse.success();
             case "W2Available":    //setW2Available
                 signaldetect.msgQ.add(new W2Available());
+                return ExecuteResponse.success();
+            case "NewOrder":
+                signaldetect.msgQ.add(new NewOrder());
                 return ExecuteResponse.success();
             default:
                 return ExecuteResponse.badRequest(args) ;

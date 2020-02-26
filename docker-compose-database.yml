@@ -1,0 +1,22 @@
+version: '2'
+services:
+  db:
+    image: postgres
+    container_name: postgres
+    environment:
+      - POSTGRES_DB=gocas_shop
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=qwe123
+    ports:
+      # just if you also want to access it directly from you host
+      # node needed for adminer
+      - "50000:5432"
+  adminer:
+    image: adminer
+    restart: unless-stopped
+    ports:
+      - 8081:8080
+    links:
+      - db
+    depends_on:
+      - db
