@@ -3,7 +3,6 @@ package servers;
 import com.impossibl.postgres.api.jdbc.PGConnection;
 import com.impossibl.postgres.api.jdbc.PGNotificationListener;
 import com.impossibl.postgres.jdbc.PGDataSource;
-import configurators.UnixClient;
 import listeners.CustomRegistrationListener;
 import org.eclipse.leshan.core.model.ObjectLoader;
 import org.eclipse.leshan.core.model.ObjectModel;
@@ -21,7 +20,6 @@ public class Configurator {
 
     private final static String[] modelPaths = new String[] {"R1_Objects.xml","R2_Objects.xml","R3_Objects.xml","W1_Config.xml"};
     private static LeshanServer server;
-    private static JettyServer httpserver;
     static final String DB_URL = "jdbc:pgsql://localhost:50000/gocas_shop";
     static final String USER = "admin";
     static final String PASS = "qwe123";
@@ -83,12 +81,9 @@ public class Configurator {
     public static void main(String[] args) throws Exception {
         server = createAndStartServer();
         setRegistrationListener();
-        httpserver = new JettyServer();
-        new Thread(httpserver).start();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try{
                 conn.close();
-                httpserver.stop();
                 server.stop();
             }catch(SQLException se){}
             System.out.println("\nGoodbye!");
