@@ -18,6 +18,8 @@ be found [here]. The system uses 5 Rasberry Pi Mode 3 B+.
 * [Leshan LWM2M] - Java implementation of OMA LWM2M Application Protocol
 * [Docker SDK for Python] - A Python library for the Docker Engine API
 
+For more information contact me through Linkedin
+
 [//]: # (These are reference links used in the body of this note and get stripped out when the markdown processor does its job. There is no need to format nicely because it shouldn't be seen. Thanks SO - http://stackoverflow.com/questions/4823468/store-comments-in-markdown-syntax)
 
    [Docker]: <https://www.docker.com/>
